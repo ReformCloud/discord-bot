@@ -1,0 +1,7 @@
+.idea
+target
+dependency-reduced-pom.xml
+*.iml
+*.class
+.mvn/wrapper/maven-wrapper.jar
+pom.xml.versionsBackup
