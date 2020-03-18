@@ -36,22 +36,18 @@ import systems.reformcloud.console.events.ConsoleLineReadEvent;
  * @author Pasqual Koschmieder
  * @since 1.0
  */
-public final class TerminalReaderThread extends Thread {
+public final class TerminalReader {
 
     private static final String PROMPT = System.getProperty(
             "console.prompt",
             "[" + System.getProperty("user.name") + "@" + System.getProperty("user.dir") + " ~]$ "
     );
 
-    public TerminalReaderThread(@NotNull TerminalConsole terminalConsole) {
-        this.terminalConsole = terminalConsole;
-        setDaemon(true);
+    private TerminalReader() {
+        throw new UnsupportedOperationException();
     }
 
-    private final TerminalConsole terminalConsole;
-
-    @Override
-    public void run() {
+    public static void start(@NotNull TerminalConsole terminalConsole) {
         String line;
 
         while (!Thread.interrupted()) {

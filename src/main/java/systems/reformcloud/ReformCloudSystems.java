@@ -24,6 +24,7 @@
 package systems.reformcloud;
 
 import systems.reformcloud.console.basic.BasicTerminalConsole;
+import systems.reformcloud.console.reader.TerminalReader;
 import systems.reformcloud.handler.ReformCloudSystemsBotHandler;
 
 import java.io.IOException;
@@ -39,7 +40,7 @@ public final class ReformCloudSystems {
 
     public static synchronized void main(String[] args) throws IOException {
         var console = new BasicTerminalConsole();
-        var handler = new ReformCloudSystemsBotHandler(console);
+        var handler = new ReformCloudSystemsBotHandler();
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             try {
@@ -49,5 +50,7 @@ public final class ReformCloudSystems {
                 ex.printStackTrace();
             }
         }));
+
+        TerminalReader.start(console);
     }
 }

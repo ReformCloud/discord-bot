@@ -27,8 +27,6 @@ import org.jetbrains.annotations.NotNull;
 import systems.reformcloud.api.GlobalAPI;
 import systems.reformcloud.commands.CommandMap;
 import systems.reformcloud.commands.basic.BasicCommandMap;
-import systems.reformcloud.console.TerminalConsole;
-import systems.reformcloud.console.reader.TerminalReaderThread;
 import systems.reformcloud.database.DatabaseDriver;
 import systems.reformcloud.database.basic.H2DatabaseConfig;
 import systems.reformcloud.database.basic.H2DatabaseDriver;
@@ -52,14 +50,12 @@ public final class ReformCloudSystemsBotHandler {
 
     private DiscordBot discordBot;
 
-    public ReformCloudSystemsBotHandler(@NotNull TerminalConsole terminalConsole) {
+    public ReformCloudSystemsBotHandler() {
         this.databaseDriver = new H2DatabaseDriver();
         this.databaseDriver.connect(new H2DatabaseConfig());
 
         this.discordBot = new DiscordBot();
         GlobalAPI.setParent(this);
-
-        new TerminalReaderThread(terminalConsole).start();
     }
 
     /**
