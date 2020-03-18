@@ -24,6 +24,7 @@
 package systems.reformcloud.commands.source;
 
 import org.jetbrains.annotations.NotNull;
+import systems.reformcloud.util.Nameable;
 
 /**
  * Represents any source of a command, for example the console source.
@@ -31,7 +32,7 @@ import org.jetbrains.annotations.NotNull;
  * @author Pasqual Koschmieder
  * @since 1.0
  */
-public interface CommandSource {
+public interface CommandSource extends Nameable {
 
     /**
      * Sends a message to the command sender
@@ -39,10 +40,4 @@ public interface CommandSource {
      * @param message The message which should get sent
      */
     void sendMessage(@NotNull String message);
-
-    /**
-     * @return The name of the command sender
-     */
-    @NotNull
-    String getName();
 }

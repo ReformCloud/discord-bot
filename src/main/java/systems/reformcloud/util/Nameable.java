@@ -21,37 +21,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package systems.reformcloud;
+package systems.reformcloud.util;
 
-import systems.reformcloud.console.basic.BasicTerminalConsole;
-import systems.reformcloud.console.reader.TerminalReader;
-import systems.reformcloud.handler.ReformCloudSystemsBotHandler;
-
-import java.io.IOException;
+import org.jetbrains.annotations.NotNull;
 
 /**
- * The main class which creates the instance of the console and bot handler and adds closes the things on
- * stop.
+ * Represents a class which can have a name
  *
  * @author Pasqual Koschmieder
  * @since 1.0
  */
-public final class ReformCloudSystems {
+public interface Nameable {
 
-    public static synchronized void main(String[] args) throws IOException {
-        var console = new BasicTerminalConsole();
-        var handler = new ReformCloudSystemsBotHandler();
-
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            try {
-                handler.close();
-                console.close();
-            } catch (final Exception ex) {
-                ex.printStackTrace();
-            }
-        }));
-
-        Thread.currentThread().setUncaughtExceptionHandler((t, ex) -> ex.printStackTrace());
-        TerminalReader.start(console);
-    }
+    /**
+     * @return The name of the current instance
+     */
+    @NotNull
+    String getName();
 }

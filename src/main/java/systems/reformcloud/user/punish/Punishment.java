@@ -24,8 +24,8 @@
 package systems.reformcloud.user.punish;
 
 import org.jetbrains.annotations.NotNull;
+import systems.reformcloud.database.object.DatabaseObject;
 
-import java.io.Serializable;
 import java.util.UUID;
 
 /**
@@ -34,13 +34,18 @@ import java.util.UUID;
  * @author Pasqual Koschmieder
  * @since 1.0
  */
-public interface Punishment extends Serializable {
+public interface Punishment extends DatabaseObject {
 
     /**
      * @return The unique id of the current punishment
      */
     @NotNull
     UUID getUniqueID();
+
+    /**
+     * @return The id of the user which got punished
+     */
+    long getUserID();
 
     /**
      * @return The time in milliseconds the punishment came from
@@ -65,6 +70,12 @@ public interface Punishment extends Serializable {
     }
 
     /**
+     * @return The name of the provider which created the current punishment
+     */
+    @NotNull
+    String getProvider();
+
+    /**
      * @return The name of the user which warned the person
      */
     @NotNull
@@ -82,4 +93,9 @@ public interface Punishment extends Serializable {
      */
     @NotNull
     String getReason();
+
+    /**
+     * Revokes the punishment
+     */
+    void revoke();
 }

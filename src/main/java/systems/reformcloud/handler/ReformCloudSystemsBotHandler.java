@@ -23,16 +23,20 @@
  */
 package systems.reformcloud.handler;
 
+import net.dv8tion.jda.api.JDA;
 import org.jetbrains.annotations.NotNull;
 import systems.reformcloud.api.GlobalAPI;
+import systems.reformcloud.bot.Bot;
 import systems.reformcloud.commands.CommandMap;
 import systems.reformcloud.commands.basic.BasicCommandMap;
 import systems.reformcloud.database.DatabaseDriver;
 import systems.reformcloud.database.basic.H2DatabaseConfig;
 import systems.reformcloud.database.basic.H2DatabaseDriver;
 import systems.reformcloud.discord.DiscordBot;
+import systems.reformcloud.discord.DiscordConnectionHandler;
 import systems.reformcloud.events.EventManager;
 import systems.reformcloud.events.basic.BasicEventManager;
+import systems.reformcloud.user.punish.util.PunishmentsDeleter;
 
 /**
  * The main class handler for the reformcloud bot. Handles all database connections and console stuff.
@@ -48,13 +52,18 @@ public final class ReformCloudSystemsBotHandler {
 
     private final DatabaseDriver databaseDriver;
 
-    private DiscordBot discordBot;
+    private Bot<JDA> discordBot;
 
     public ReformCloudSystemsBotHandler() {
         this.databaseDriver = new H2DatabaseDriver();
         this.databaseDriver.connect(new H2DatabaseConfig());
 
         this.discordBot = new DiscordBot();
+        this.discordBot.doConnect(new DiscordConnectionHandler());
+
+        PunishmentsDeleter.startReload();
+        PunishmentsDeleter.startExpiredHandler();
+
         GlobalAPI.setParent(this);
     }
 

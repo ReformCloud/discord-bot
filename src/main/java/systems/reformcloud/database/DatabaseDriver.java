@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 /**
  * Represents a database connection
@@ -133,6 +134,24 @@ public interface DatabaseDriver {
      * @param key   The key of the database which should get deleted
      */
     void deleteFromTable(@NotNull String table, @NotNull String key);
+
+    /**
+     * Deletes the specified database object from the database
+     *
+     * @param databaseObject The object which should get deleted
+     */
+    default void deleteFromTable(@NotNull DatabaseObject databaseObject) {
+        this.deleteFromTable(databaseObject.getTable(), databaseObject.getKey());
+    }
+
+    /**
+     * Creates a stream from all key names in a database table
+     *
+     * @param table The table from which the keys should be in the stream
+     * @return A stream which all key names of all database rows
+     */
+    @NotNull
+    Stream<String> keys(@NotNull String table);
 
     /**
      * Closes the current connection to the database

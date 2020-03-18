@@ -21,37 +21,64 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package systems.reformcloud;
+package systems.reformcloud.user.warn.basic;
 
-import systems.reformcloud.console.basic.BasicTerminalConsole;
-import systems.reformcloud.console.reader.TerminalReader;
-import systems.reformcloud.handler.ReformCloudSystemsBotHandler;
+import org.jetbrains.annotations.NotNull;
+import systems.reformcloud.user.warn.Warn;
 
-import java.io.IOException;
+import java.util.UUID;
 
 /**
- * The main class which creates the instance of the console and bot handler and adds closes the things on
- * stop.
+ * Represents a basic implementation of a warn
  *
  * @author Pasqual Koschmieder
  * @since 1.0
  */
-public final class ReformCloudSystems {
+public class BasicWarn implements Warn {
 
-    public static synchronized void main(String[] args) throws IOException {
-        var console = new BasicTerminalConsole();
-        var handler = new ReformCloudSystemsBotHandler();
+    public BasicWarn(long time, long warner, String warnerName, String reason) {
+        this.uniqueID = UUID.randomUUID();
+        this.time = time;
+        this.warner = warner;
+        this.warnerName = warnerName;
+        this.reason = reason;
+    }
 
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            try {
-                handler.close();
-                console.close();
-            } catch (final Exception ex) {
-                ex.printStackTrace();
-            }
-        }));
+    private final UUID uniqueID;
 
-        Thread.currentThread().setUncaughtExceptionHandler((t, ex) -> ex.printStackTrace());
-        TerminalReader.start(console);
+    private final long time;
+
+    private final long warner;
+
+    private final String warnerName;
+
+    private final String reason;
+
+    @NotNull
+    @Override
+    public UUID getUniqueID() {
+        return this.uniqueID;
+    }
+
+    @Override
+    public long getMilliTime() {
+        return this.time;
+    }
+
+    @Override
+    public long getWarner() {
+        return this.warner;
+    }
+
+    @NotNull
+    @Override
+    public String getWarnerName() {
+        return this.warnerName;
+    }
+
+    @NotNull
+    @Override
+    public String getReason() {
+        return this.reason;
     }
 }

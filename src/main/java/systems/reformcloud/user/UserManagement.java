@@ -26,6 +26,8 @@ package systems.reformcloud.user;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.Nonnull;
+
 /**
  * Represents any user management for for example discord or teamspeak.
  *
@@ -59,6 +61,13 @@ public interface UserManagement {
      * @param user The user which should get updated
      */
     void updateUser(@NotNull User user);
+
+    /**
+     * Invalidates the given user from the local cache
+     *
+     * @param user The user which should get invalidated from the cache
+     */
+    void invalidate(@Nonnull User user);
 
     /**
      * Flushes the cache into the database and closes the user management

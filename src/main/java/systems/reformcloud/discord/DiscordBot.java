@@ -26,10 +26,19 @@ package systems.reformcloud.discord;
 import com.google.common.base.Preconditions;
 import net.dv8tion.jda.api.JDA;
 import org.jetbrains.annotations.NotNull;
+import systems.reformcloud.api.GlobalAPI;
 import systems.reformcloud.bot.Bot;
 import systems.reformcloud.bot.BotConnectionHandler;
+import systems.reformcloud.bot.feature.BotFeature;
+import systems.reformcloud.discord.features.CommandHandlerFeature;
+import systems.reformcloud.discord.features.logger.LoggerFeature;
+import systems.reformcloud.discord.punishments.listener.PunishmentRevokeListener;
 import systems.reformcloud.discord.user.DiscordUserManagement;
 import systems.reformcloud.user.UserManagement;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Optional;
 
 /**
  * A basic implementation of a {@link Bot} for the discord env.
@@ -47,13 +56,27 @@ public class DiscordBot implements Bot<JDA> {
     public void doConnect(@NotNull BotConnectionHandler<JDA> connectionHandler) {
         this.jda = Preconditions.checkNotNull(connectionHandler.connect(), "Unable to connect to discord web host");
         this.userManagement = new DiscordUserManagement();
+
+        DiscordUtil.init(this.jda);
+
+        this.init(Arrays.asList(
+                new CommandHandlerFeature(),
+                new LoggerFeature()
+        ));
+
+        GlobalAPI.getEventManager().registerListener(new PunishmentRevokeListener(this));
     }
 
     @Override
-    public void init() {
+    public void init(@NotNull Collection<BotFeature<JDA>> botFeatures) {
         if (this.jda == null) {
             throw new IllegalStateException("JDA is not initialized yet");
         }
+
+        botFeatures
+                .stream()
+                .filter(e -> e.isApplicableTo(this))
+                .forEach(e -> e.handleStart(this));
     }
 
     @Override
@@ -78,5 +101,11 @@ public class DiscordBot implements Bot<JDA> {
             this.userManagement.flushAndClose();
             this.userManagement = null;
         }
+    }
+
+    @NotNull
+    @Override
+    public Optional<JDA> getCurrentInstance() {
+        return Optional.ofNullable(this.jda);
     }
 }

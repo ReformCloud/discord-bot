@@ -21,37 +21,40 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package systems.reformcloud;
+package systems.reformcloud.user.punish.basic;
 
-import systems.reformcloud.console.basic.BasicTerminalConsole;
-import systems.reformcloud.console.reader.TerminalReader;
-import systems.reformcloud.handler.ReformCloudSystemsBotHandler;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import systems.reformcloud.user.punish.Punishment;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.util.function.Function;
 
 /**
- * The main class which creates the instance of the console and bot handler and adds closes the things on
- * stop.
+ * Represents a mapper for a collection of database reads
  *
  * @author Pasqual Koschmieder
  * @since 1.0
  */
-public final class ReformCloudSystems {
+public class PunishmentDatabaseMapper implements Function<byte[], Punishment> {
 
-    public static synchronized void main(String[] args) throws IOException {
-        var console = new BasicTerminalConsole();
-        var handler = new ReformCloudSystemsBotHandler();
+    public static final Function<byte[], Punishment> INSTANCE = new PunishmentDatabaseMapper();
 
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            try {
-                handler.close();
-                console.close();
-            } catch (final Exception ex) {
-                ex.printStackTrace();
-            }
-        }));
+    private PunishmentDatabaseMapper() {
+    }
 
-        Thread.currentThread().setUncaughtExceptionHandler((t, ex) -> ex.printStackTrace());
-        TerminalReader.start(console);
+    @Override
+    @Nullable
+    public Punishment apply(@NotNull byte[] bytes) {
+        try (ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
+             ObjectInputStream stream = new ObjectInputStream(byteArrayInputStream)) {
+            return BasicPunishment.deserialize(stream);
+        } catch (final IOException ex) {
+            ex.printStackTrace();
+        }
+
+        return null;
     }
 }

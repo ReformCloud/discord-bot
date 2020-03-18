@@ -21,57 +21,45 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package systems.reformcloud.bot;
+package systems.reformcloud.user.punish.util;
 
 import org.jetbrains.annotations.NotNull;
-import systems.reformcloud.bot.feature.BotFeature;
-import systems.reformcloud.user.UserManagement;
+import systems.reformcloud.api.GlobalAPI;
+import systems.reformcloud.user.punish.Punishment;
+import systems.reformcloud.user.punish.basic.PunishmentDatabaseObjectToken;
 
 import java.util.Collection;
-import java.util.Optional;
+import java.util.Objects;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
- * Represents a bot
+ * A simple database reader which
  *
  * @author Pasqual Koschmieder
  * @since 1.0
  */
-public interface Bot<T> {
+public final class PunishmentsDatabaseReader {
 
-    /**
-     * Connects the bot and sets the instance for the remote handling
-     *
-     * @param connectionHandler The connection handler which is associated with the current bot backend
-     */
-    void doConnect(@NotNull BotConnectionHandler<T> connectionHandler);
+    private PunishmentsDatabaseReader() {
+        throw new UnsupportedOperationException();
+    }
 
-    /**
-     * Inits the event handlers all commands associated to this bot. Should be called after the
-     * {@link #doConnect(BotConnectionHandler)} method to ensure the parent handlers are created.
-     *
-     * @throws IllegalStateException If the bot is not initialized yet or already stopped
-     */
-    void init(@NotNull Collection<BotFeature<T>> botFeatures);
-
-    /**
-     * @return The user management which is associated with the current bot instance
-     */
     @NotNull
-    UserManagement getAssociatedUserManagement();
-
-    /**
-     * @return If the bot is online and connected
-     */
-    boolean isConnected();
-
-    /**
-     * Shuts the bot immediately down
-     */
-    void shutdownNow();
-
-    /**
-     * @return The currently running instance of the bot
-     */
-    @NotNull
-    Optional<T> getCurrentInstance();
+    public static Collection<Punishment> getExpiringPunishments(@NotNull String type) {
+        return GlobalAPI.getDatabaseDriver().keys("punishments_" + type)
+                .filter(Objects::nonNull)
+                .map(e -> {
+                    try {
+                        return Long.parseLong(e);
+                    } catch (final NumberFormatException ex) {
+                        return null;
+                    }
+                }).filter(Objects::nonNull)
+                .filter(e -> e != -1)
+                .filter(e -> (e + TimeUnit.MINUTES.toMillis(10) > System.currentTimeMillis()))
+                .map(e -> GlobalAPI.getDatabaseDriver().getOrDefault(new PunishmentDatabaseObjectToken(e, type), null))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+    }
 }

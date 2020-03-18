@@ -21,48 +21,55 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package systems.reformcloud.user.information;
+package systems.reformcloud.discord.features;
+
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.jetbrains.annotations.NotNull;
+import systems.reformcloud.bot.Bot;
+import systems.reformcloud.bot.feature.BotFeature;
 
 /**
- * Represents a basic implementation of a {@link UserInformation}.
+ * Represents a feature as listener for the discord env.
  *
  * @author Pasqual Koschmieder
  * @since 1.0
  */
-public class BasicUserInformation implements UserInformation {
+public abstract class DiscordFeature extends ListenerAdapter implements BotFeature<JDA> {
 
-    public BasicUserInformation() {
-        this.firstJoinTime = System.currentTimeMillis();
-    }
-
-    private long joinTimeInMillis = 0;
-
-    private long totalJoins = 0;
-
-    private final long firstJoinTime;
+    private Bot<JDA> parent;
 
     @Override
-    public long getFirstJoinTimeInMillis() {
-        return this.firstJoinTime;
-    }
+    public void handleStart(@NotNull Bot<JDA> bot) {
+        if (this.isInitialized()) {
+            throw new IllegalStateException("The feature is already initialized");
+        }
 
-    @Override
-    public long getJoinTimeInMillis() {
-        return this.joinTimeInMillis;
+        this.parent = bot;
+        bot.getCurrentInstance().ifPresent(e -> e.addEventListener(this));
+        System.out.println("Registered discord feature " + this.getName());
     }
 
     @Override
-    public long getTotalJoins() {
-        return this.totalJoins;
+    public void handleStop() {
+        if (this.isInitialized()) {
+            this.getApi().getCurrentInstance().ifPresent(e -> e.removeEventListener(this));
+            System.out.println("Closed discord feature " + this.getName());
+        }
     }
 
     @Override
-    public void addJoin() {
-        this.totalJoins++;
+    public Bot<JDA> getApi() {
+        return this.parent;
     }
 
     @Override
-    public void setJoinTime() {
-        this.joinTimeInMillis = System.currentTimeMillis();
+    public boolean isInitialized() {
+        return this.parent != null;
+    }
+
+    @Override
+    public boolean isApplicableTo(@NotNull Bot<?> bot) {
+        return bot.getCurrentInstance().isPresent() && bot.getCurrentInstance().get() instanceof JDA;
     }
 }

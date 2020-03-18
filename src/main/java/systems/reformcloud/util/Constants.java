@@ -21,37 +21,38 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package systems.reformcloud;
+package systems.reformcloud.util;
 
-import systems.reformcloud.console.basic.BasicTerminalConsole;
-import systems.reformcloud.console.reader.TerminalReader;
-import systems.reformcloud.handler.ReformCloudSystemsBotHandler;
-
-import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 /**
- * The main class which creates the instance of the console and bot handler and adds closes the things on
- * stop.
+ * Some constant values for the bot
  *
  * @author Pasqual Koschmieder
  * @since 1.0
  */
-public final class ReformCloudSystems {
+public final class Constants {
 
-    public static synchronized void main(String[] args) throws IOException {
-        var console = new BasicTerminalConsole();
-        var handler = new ReformCloudSystemsBotHandler();
-
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            try {
-                handler.close();
-                console.close();
-            } catch (final Exception ex) {
-                ex.printStackTrace();
-            }
-        }));
-
-        Thread.currentThread().setUncaughtExceptionHandler((t, ex) -> ex.printStackTrace());
-        TerminalReader.start(console);
+    private Constants() {
+        throw new UnsupportedOperationException();
     }
+
+    /**
+     * The basic date format used in the system
+     */
+    public static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy/MM/DD HH:mm:ss");
+
+    /**
+     * The executor service to supply the async tasks to
+     */
+    public static final ExecutorService EXECUTOR_SERVICE = Executors.newCachedThreadPool();
+
+    /**
+     * The executor service for scheduled tasks
+     */
+    public static final ScheduledExecutorService SCHEDULED_EXECUTOR_SERVICE = Executors.newSingleThreadScheduledExecutor();
 }

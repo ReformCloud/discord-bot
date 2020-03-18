@@ -21,37 +21,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package systems.reformcloud;
+package systems.reformcloud.user.punish.event;
 
-import systems.reformcloud.console.basic.BasicTerminalConsole;
-import systems.reformcloud.console.reader.TerminalReader;
-import systems.reformcloud.handler.ReformCloudSystemsBotHandler;
-
-import java.io.IOException;
+import systems.reformcloud.events.Event;
+import systems.reformcloud.user.punish.Punishment;
 
 /**
- * The main class which creates the instance of the console and bot handler and adds closes the things on
- * stop.
+ * This events get called when a punishments gets revoked
  *
  * @author Pasqual Koschmieder
  * @since 1.0
  */
-public final class ReformCloudSystems {
+public final class PunishmentRevokeEvent extends Event {
 
-    public static synchronized void main(String[] args) throws IOException {
-        var console = new BasicTerminalConsole();
-        var handler = new ReformCloudSystemsBotHandler();
+    public PunishmentRevokeEvent(Punishment punishment) {
+        this.punishment = punishment;
+    }
 
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            try {
-                handler.close();
-                console.close();
-            } catch (final Exception ex) {
-                ex.printStackTrace();
-            }
-        }));
+    private final Punishment punishment;
 
-        Thread.currentThread().setUncaughtExceptionHandler((t, ex) -> ex.printStackTrace());
-        TerminalReader.start(console);
+    public Punishment getPunishment() {
+        return punishment;
     }
 }

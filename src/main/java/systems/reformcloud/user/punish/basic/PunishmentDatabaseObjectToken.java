@@ -21,37 +21,53 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package systems.reformcloud;
+package systems.reformcloud.user.punish.basic;
 
-import systems.reformcloud.console.basic.BasicTerminalConsole;
-import systems.reformcloud.console.reader.TerminalReader;
-import systems.reformcloud.handler.ReformCloudSystemsBotHandler;
+import org.jetbrains.annotations.NotNull;
+import systems.reformcloud.database.object.DatabaseObjectToken;
+import systems.reformcloud.user.punish.Punishment;
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
 
 /**
- * The main class which creates the instance of the console and bot handler and adds closes the things on
- * stop.
+ * Represents a database token for a punishment
  *
  * @author Pasqual Koschmieder
  * @since 1.0
  */
-public final class ReformCloudSystems {
+public class PunishmentDatabaseObjectToken extends DatabaseObjectToken<Punishment> {
 
-    public static synchronized void main(String[] args) throws IOException {
-        var console = new BasicTerminalConsole();
-        var handler = new ReformCloudSystemsBotHandler();
+    public PunishmentDatabaseObjectToken(long timeOut, String type) {
+        this.timeOut = timeOut;
+        this.type = type;
+    }
 
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            try {
-                handler.close();
-                console.close();
-            } catch (final Exception ex) {
-                ex.printStackTrace();
-            }
-        }));
+    private final long timeOut;
 
-        Thread.currentThread().setUncaughtExceptionHandler((t, ex) -> ex.printStackTrace());
-        TerminalReader.start(console);
+    private final String type;
+
+    @NotNull
+    @Override
+    public Punishment deserialize(@NotNull ObjectInputStream stream) {
+        try {
+            return BasicPunishment.deserialize(stream);
+        } catch (final IOException ex) {
+            ex.printStackTrace();
+        }
+
+        return new BasicPunishment(0, 0, 0, 0, "", "", "", "");
+    }
+
+    @NotNull
+    @Override
+    public String getTable() {
+        return "punishments_" + type;
+    }
+
+    @NotNull
+    @Override
+    public String getKey() {
+        return Long.toString(timeOut);
     }
 }

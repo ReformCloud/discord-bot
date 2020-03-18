@@ -32,6 +32,7 @@ import systems.reformcloud.api.GlobalAPI;
 import systems.reformcloud.user.User;
 import systems.reformcloud.user.UserManagement;
 
+import javax.annotation.Nonnull;
 import java.time.Duration;
 
 /**
@@ -88,6 +89,11 @@ public class DiscordUserManagement implements UserManagement {
         this.userCache.put(user.getId(), user);
 
         GlobalAPI.getDatabaseDriver().update(user);
+    }
+
+    @Override
+    public void invalidate(@Nonnull User user) {
+        this.userCache.invalidate(user.getId());
     }
 
     @Override

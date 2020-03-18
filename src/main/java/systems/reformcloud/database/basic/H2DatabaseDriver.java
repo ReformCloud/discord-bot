@@ -35,8 +35,11 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 /**
  * A default implementation of a database driver
@@ -153,6 +156,23 @@ public class H2DatabaseDriver implements DatabaseDriver {
         } catch (final SQLException ex) {
             ex.printStackTrace();
         }
+    }
+
+    @NotNull
+    @Override
+    public Stream<String> keys(@NotNull String table) {
+        Collection<String> collector = new ArrayList<>();
+        try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM " + table)) {
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+                collector.add(resultSet.getString("key"));
+            }
+        } catch (final SQLException ex) {
+            ex.printStackTrace();
+        }
+
+        return collector.stream();
     }
 
     @Override

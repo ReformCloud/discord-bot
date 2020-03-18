@@ -21,37 +21,45 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package systems.reformcloud;
+package systems.reformcloud.discord;
 
-import systems.reformcloud.console.basic.BasicTerminalConsole;
-import systems.reformcloud.console.reader.TerminalReader;
-import systems.reformcloud.handler.ReformCloudSystemsBotHandler;
-
-import java.io.IOException;
+import com.google.common.base.Preconditions;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Role;
+import org.jetbrains.annotations.NotNull;
 
 /**
- * The main class which creates the instance of the console and bot handler and adds closes the things on
- * stop.
+ * The discord punishment util
  *
  * @author Pasqual Koschmieder
  * @since 1.0
  */
-public final class ReformCloudSystems {
+public final class DiscordUtil {
 
-    public static synchronized void main(String[] args) throws IOException {
-        var console = new BasicTerminalConsole();
-        var handler = new ReformCloudSystemsBotHandler();
+    private DiscordUtil() {
+        throw new UnsupportedOperationException();
+    }
 
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            try {
-                handler.close();
-                console.close();
-            } catch (final Exception ex) {
-                ex.printStackTrace();
-            }
-        }));
+    private static Role punishedRole;
 
-        Thread.currentThread().setUncaughtExceptionHandler((t, ex) -> ex.printStackTrace());
-        TerminalReader.start(console);
+    private static Guild guild;
+
+    public static void init(@NotNull JDA parent) {
+        var roleId = Preconditions.checkNotNull(System.getProperty("discord-punish-role"), "Unable to load discord punish role");
+        punishedRole = Preconditions.checkNotNull(parent.getRoleById(roleId), "Unable to find role with id %s", roleId);
+
+        var guildID = Preconditions.checkNotNull(System.getProperty("discord-guild"), "Unable to load discord guild id");
+        guild = Preconditions.checkNotNull(parent.getGuildById(guildID), "Unable to find guild with id %s", roleId);
+    }
+
+    @NotNull
+    public static Role getPunishedRole() {
+        return punishedRole;
+    }
+
+    @NotNull
+    public static Guild getGuild() {
+        return guild;
     }
 }

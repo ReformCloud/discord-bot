@@ -34,6 +34,11 @@ import java.io.Serializable;
 public interface UserInformation extends Serializable {
 
     /**
+     * @return The time of the first join of the user
+     */
+    long getFirstJoinTimeInMillis();
+
+    /**
      * @return Represents the last join time on the guild
      */
     long getJoinTimeInMillis();

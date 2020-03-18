@@ -21,37 +21,51 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package systems.reformcloud;
+package systems.reformcloud.bot.feature;
 
-import systems.reformcloud.console.basic.BasicTerminalConsole;
-import systems.reformcloud.console.reader.TerminalReader;
-import systems.reformcloud.handler.ReformCloudSystemsBotHandler;
-
-import java.io.IOException;
+import org.jetbrains.annotations.NotNull;
+import systems.reformcloud.annotations.UndefinedNullability;
+import systems.reformcloud.bot.Bot;
+import systems.reformcloud.util.Nameable;
 
 /**
- * The main class which creates the instance of the console and bot handler and adds closes the things on
- * stop.
+ * Represents a feature a bot can have
  *
  * @author Pasqual Koschmieder
  * @since 1.0
  */
-public final class ReformCloudSystems {
+public interface BotFeature<T> extends Nameable {
 
-    public static synchronized void main(String[] args) throws IOException {
-        var console = new BasicTerminalConsole();
-        var handler = new ReformCloudSystemsBotHandler();
+    /**
+     * Handles the start of the bot for which the feature is made
+     *
+     * @param bot The bot for which the feature is made
+     * @throws IllegalStateException If the feature is already initialized
+     * @see #isApplicableTo(Bot)
+     */
+    void handleStart(@NotNull Bot<T> bot);
 
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            try {
-                handler.close();
-                console.close();
-            } catch (final Exception ex) {
-                ex.printStackTrace();
-            }
-        }));
+    /**
+     * Handles the stop of the parent bot
+     */
+    void handleStop();
 
-        Thread.currentThread().setUncaughtExceptionHandler((t, ex) -> ex.printStackTrace());
-        TerminalReader.start(console);
-    }
+    /**
+     * @return The current api instance or {@code null} if the feature is not loaded or already stopped
+     */
+    @UndefinedNullability
+    Bot<T> getApi();
+
+    /**
+     * @return If the current feature is initialized and running
+     */
+    boolean isInitialized();
+
+    /**
+     * Checks if the current feature is made for the given bot
+     *
+     * @param bot The bot which should get checked
+     * @return If the feature is made for the bot
+     */
+    boolean isApplicableTo(@NotNull Bot<?> bot);
 }

@@ -21,37 +21,39 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package systems.reformcloud;
+package systems.reformcloud.util;
 
-import systems.reformcloud.console.basic.BasicTerminalConsole;
-import systems.reformcloud.console.reader.TerminalReader;
-import systems.reformcloud.handler.ReformCloudSystemsBotHandler;
-
-import java.io.IOException;
+import java.util.Map;
 
 /**
- * The main class which creates the instance of the console and bot handler and adds closes the things on
- * stop.
+ * A basic implementation of a map entry
  *
  * @author Pasqual Koschmieder
- * @since 1.0
+ * @since 1.o
  */
-public final class ReformCloudSystems {
+public final class KeyValueHolder<K, V> implements Map.Entry<K, V> {
 
-    public static synchronized void main(String[] args) throws IOException {
-        var console = new BasicTerminalConsole();
-        var handler = new ReformCloudSystemsBotHandler();
+    public KeyValueHolder(K key, V value) {
+        this.key = key;
+        this.value = value;
+    }
 
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            try {
-                handler.close();
-                console.close();
-            } catch (final Exception ex) {
-                ex.printStackTrace();
-            }
-        }));
+    private final K key;
 
-        Thread.currentThread().setUncaughtExceptionHandler((t, ex) -> ex.printStackTrace());
-        TerminalReader.start(console);
+    private V value;
+
+    @Override
+    public K getKey() {
+        return this.key;
+    }
+
+    @Override
+    public V getValue() {
+        return this.value;
+    }
+
+    @Override
+    public V setValue(V v) {
+        return this.value = v;
     }
 }
