@@ -52,6 +52,11 @@ public class ConsoleCommandSource implements CommandSource {
     }
 
     @Override
+    public long getSourceChannel() {
+        return 0;
+    }
+
+    @Override
     public @NotNull
     String getName() {
         return "ConsoleCommandSource";

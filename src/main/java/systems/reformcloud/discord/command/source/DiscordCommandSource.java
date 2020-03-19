@@ -61,6 +61,11 @@ public final class DiscordCommandSource implements CommandSource {
         return member.getIdLong();
     }
 
+    @Override
+    public long getSourceChannel() {
+        return this.textChannel.getIdLong();
+    }
+
     @NotNull
     @Override
     public String getName() {

@@ -30,6 +30,7 @@ import systems.reformcloud.api.GlobalAPI;
 import systems.reformcloud.bot.Bot;
 import systems.reformcloud.bot.BotConnectionHandler;
 import systems.reformcloud.bot.feature.BotFeature;
+import systems.reformcloud.discord.command.commands.ListWarnsCommand;
 import systems.reformcloud.discord.command.commands.WarnCommand;
 import systems.reformcloud.discord.features.CommandHandlerFeature;
 import systems.reformcloud.discord.features.logger.LoggerFeature;
@@ -74,6 +75,7 @@ public class DiscordBot implements Bot<JDA> {
         GlobalAPI.getEventManager().registerListener(new DiscordUserJoinListener());
 
         GlobalAPI.getCommandMap().registerCommand(new WarnCommand(this));
+        GlobalAPI.getCommandMap().registerCommand(new ListWarnsCommand(this));
     }
 
     @Override

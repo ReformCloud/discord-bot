@@ -53,4 +53,9 @@ public interface CommandSource extends Nameable {
      * @return The id of the command source
      */
     long getId();
+
+    /**
+     * @return The id of the source channel
+     */
+    long getSourceChannel();
 }

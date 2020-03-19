@@ -23,30 +23,29 @@
  */
 package systems.reformcloud.discord.command.commands;
 
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Permission;
 import org.jetbrains.annotations.NotNull;
-import systems.reformcloud.api.GlobalAPI;
 import systems.reformcloud.bot.Bot;
 import systems.reformcloud.commands.source.CommandSource;
-import systems.reformcloud.discord.DiscordUtil;
 import systems.reformcloud.discord.command.BasicDiscordCommand;
 import systems.reformcloud.discord.command.util.CommandArgumentParser;
-import systems.reformcloud.discord.event.DiscordUserWarnEvent;
-import systems.reformcloud.user.warn.basic.BasicWarn;
+import systems.reformcloud.user.warn.Warn;
+import systems.reformcloud.util.Constants;
 
-import java.util.Arrays;
+import java.awt.*;
 
 /**
- * A discord command for the warns
+ * A command to list all warns of a discord user
  *
  * @author Pasqual Koschmieder
  * @since 1.0
  */
-public final class WarnCommand extends BasicDiscordCommand {
+public final class ListWarnsCommand extends BasicDiscordCommand {
 
-    public WarnCommand(@NotNull Bot<JDA> parent) {
-        super("warn", new String[0], "Warns an user");
+    public ListWarnsCommand(@NotNull Bot<JDA> parent) {
+        super("listwarns", new String[]{"lw"}, "Lists the warns of an user");
         this.parent = parent;
     }
 
@@ -64,40 +63,36 @@ public final class WarnCommand extends BasicDiscordCommand {
             return;
         }
 
-        if (strings.length < 2) {
-            source.sendMessage("Invalid command syntax! Use: `warn <user id | @mention> <reason>`");
+        if (strings.length != 1) {
+            source.sendMessage("Invalid command syntax! Use: `lw <user id | @mention>`");
             return;
         }
 
-        var user = CommandArgumentParser.getUserOrCreate(strings[0], source, this.parent);
+        var user = CommandArgumentParser.getExistingUser(strings[0], source, this.parent);
         if (user == null) {
+            source.sendMessage("Unable to find user " + strings[0] + " in the database");
             return;
         }
 
-        var member = DiscordUtil.getGuild().retrieveMemberById(user.getId(), true).submit().join();
-        if (member == null && !source.hasPermission(Permission.ADMINISTRATOR)) {
-            source.sendMessage("You can only warn a member which is on the discord");
-            return;
+        EmbedBuilder builder = new EmbedBuilder()
+                .setColor(Color.YELLOW)
+                .setAuthor("ReformCloudSystems")
+                .setTitle("Warns of " + strings[0])
+                .setFooter(Constants.DATE_FORMAT.format(System.currentTimeMillis()))
+                .addField("total warns", Integer.toString(user.getWarns().size()), false);
+        for (Warn warn : user.getWarns()) {
+            builder.addField(
+                    Constants.DATE_FORMAT.format(warn.getMilliTime()) + " (" + warn.getUniqueID() + ")",
+                    String.format("Warned by: %s (%d); Reason: %s", warn.getWarnerName(), warn.getWarner(), warn.getReason()),
+                    false
+            );
         }
 
-        if (member != null && (member.hasPermission(Permission.MANAGE_CHANNEL)
-                || member.hasPermission(Permission.ADMINISTRATOR)
-                && !source.hasPermission(Permission.ADMINISTRATOR))) {
-            source.sendMessage("Unable to warn user " + user.getId());
-            return;
-        }
-
-        var warn = new BasicWarn(
-                System.currentTimeMillis(),
-                source.getId(),
-                source.getName(),
-                String.join(" ", Arrays.copyOfRange(strings, 1, strings.length))
-        );
-
-        user.getWarns().add(warn);
-        this.parent.getAssociatedUserManagement().updateUser(user);
-
-        GlobalAPI.getEventManager().callEvent(new DiscordUserWarnEvent(warn, parent, source, user));
-        source.sendMessage("Warned user " + strings[0] + "! Reason: " + String.join(" ", Arrays.copyOfRange(strings, 1, strings.length)));
+        this.parent.getCurrentInstance().ifPresent(e -> {
+            var channel = e.getTextChannelById(source.getSourceChannel());
+            if (channel != null) {
+                channel.sendMessage(builder.build()).queue();
+            }
+        });
     }
 }
