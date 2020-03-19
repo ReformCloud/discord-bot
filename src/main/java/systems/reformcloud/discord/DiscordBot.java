@@ -32,6 +32,7 @@ import systems.reformcloud.bot.BotConnectionHandler;
 import systems.reformcloud.bot.feature.BotFeature;
 import systems.reformcloud.discord.command.commands.DeleteWarnCommand;
 import systems.reformcloud.discord.command.commands.ListWarnsCommand;
+import systems.reformcloud.discord.command.commands.PunishCommand;
 import systems.reformcloud.discord.command.commands.WarnCommand;
 import systems.reformcloud.discord.features.CommandHandlerFeature;
 import systems.reformcloud.discord.features.logger.LoggerFeature;
@@ -71,13 +72,19 @@ public class DiscordBot implements Bot<JDA> {
                 .filter(e -> e.getRoles().size() == 0)
                 .forEach(e -> {
                     var user = this.userManagement.getUserOrCreate(e.getIdLong());
-                    if (user.getPunishments().size() > 0 && user.getPunishments()
+                    user.getPunishments()
                             .stream()
-                            .anyMatch(p -> p.getPunishmentType().equals(DefaultPunishmentTypes.MUTE.name()))) {
-                        DiscordUtil.getGuild().addRoleToMember(e, DiscordUtil.getPunishedRole()).queue();
-                    }
+                            .filter(p -> p.getPunishmentType().equals(DefaultPunishmentTypes.BAN.name()))
+                            .findAny()
+                            .ifPresentOrElse(p -> DiscordUtil.getGuild().ban(e, 0, p.getReason()).queue(), () -> {
+                                if (user.getPunishments().size() > 0 && user.getPunishments()
+                                        .stream()
+                                        .anyMatch(p -> p.getPunishmentType().equals(DefaultPunishmentTypes.MUTE.name()))) {
+                                    DiscordUtil.getGuild().addRoleToMember(e, DiscordUtil.getPunishedRole()).queue();
+                                }
 
-                    DiscordUtil.getGuild().addRoleToMember(e, DiscordUtil.getMemberRole()).queue();
+                                DiscordUtil.getGuild().addRoleToMember(e, DiscordUtil.getMemberRole()).queue();
+                            });
                 });
 
         this.init(Arrays.asList(
@@ -93,6 +100,7 @@ public class DiscordBot implements Bot<JDA> {
         GlobalAPI.getCommandMap().registerCommand(new WarnCommand(this));
         GlobalAPI.getCommandMap().registerCommand(new ListWarnsCommand(this));
         GlobalAPI.getCommandMap().registerCommand(new DeleteWarnCommand(this));
+        GlobalAPI.getCommandMap().registerCommand(new PunishCommand(this));
     }
 
     @Override

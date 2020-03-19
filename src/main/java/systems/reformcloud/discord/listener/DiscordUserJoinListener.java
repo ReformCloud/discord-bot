@@ -42,22 +42,28 @@ public class DiscordUserJoinListener {
 
     @Subscribe
     public void handle(final DiscordUserJoinEvent event) {
-        if (event.getUser().getPunishments().size() > 0 && event.getUser().getPunishments()
+        event.getUser().getPunishments()
                 .stream()
-                .anyMatch(e -> e.getPunishmentType().equals(DefaultPunishmentTypes.MUTE.name()))) {
-            DiscordUtil.getGuild().addRoleToMember(event.getEvent().getMember(), DiscordUtil.getPunishedRole()).queue();
-        }
+                .filter(e -> e.getPunishmentType().equals(DefaultPunishmentTypes.BAN.name()))
+                .findAny()
+                .ifPresentOrElse(e -> DiscordUtil.getGuild().ban(event.getEvent().getMember(), 0, e.getReason()).queue(), () -> {
+                    if (event.getUser().getPunishments().size() > 0 && event.getUser().getPunishments()
+                            .stream()
+                            .anyMatch(e -> e.getPunishmentType().equals(DefaultPunishmentTypes.MUTE.name()))) {
+                        DiscordUtil.getGuild().addRoleToMember(event.getEvent().getMember(), DiscordUtil.getPunishedRole()).queue();
+                    }
 
-        DiscordUtil.getGuild().addRoleToMember(event.getEvent().getMember(), DiscordUtil.getMemberRole()).queue();
+                    DiscordUtil.getGuild().addRoleToMember(event.getEvent().getMember(), DiscordUtil.getMemberRole()).queue();
 
-        DiscordUtil.getLoggingChannel().sendMessage(new EmbedBuilder() // TODO: use terminal channel
-                .setColor(Color.BLUE)
-                .setAuthor("ReformCloudSystems", "https://reformcloud.systems",
-                        "https://cdn.discordapp.com/emojis/557188390462947358.png")
-                .setTitle(String.format("Welcome %s on the ReformCloud discord!", event.getEvent().getUser().getName()))
-                .setThumbnail(event.getEvent().getUser().getAvatarUrl())
-                .addField("", "Please read the information in " + DiscordUtil.getInformationChannel().getAsMention(), true)
-                .build()
-        ).queue();
+                    DiscordUtil.getLoggingChannel().sendMessage(new EmbedBuilder() // TODO: use terminal channel
+                            .setColor(Color.BLUE)
+                            .setAuthor("ReformCloudSystems", "https://reformcloud.systems",
+                                    "https://cdn.discordapp.com/emojis/557188390462947358.png")
+                            .setTitle(String.format("Welcome %s on the ReformCloud discord!", event.getEvent().getUser().getName()))
+                            .setThumbnail(event.getEvent().getUser().getAvatarUrl())
+                            .addField("", "Please read the information in " + DiscordUtil.getInformationChannel().getAsMention(), true)
+                            .build()
+                    ).queue();
+                });
     }
 }

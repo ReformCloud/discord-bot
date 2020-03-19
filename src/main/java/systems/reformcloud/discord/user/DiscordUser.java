@@ -97,7 +97,10 @@ public class DiscordUser implements User {
         this.punishments
                 .stream()
                 .filter(e -> e.getUniqueID().equals(uniqueID))
-                .forEach(punishments::remove);
+                .forEach(e -> {
+                    e.revoke();
+                    punishments.remove(e);
+                });
     }
 
     @Override
