@@ -29,16 +29,9 @@ import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import org.jetbrains.annotations.Nullable;
 import systems.reformcloud.bot.BotConnectionHandler;
-import systems.reformcloud.util.FileUtils;
+import systems.reformcloud.discord.config.DiscordConfigUtil;
 
 import javax.security.auth.login.LoginException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Properties;
 
 /**
  * Represents a default implementation of the {@link BotConnectionHandler} for the discord env.
@@ -48,51 +41,21 @@ import java.util.Properties;
  */
 public class DiscordConnectionHandler implements BotConnectionHandler<JDA> {
 
-    private static final Path CONFIG = Paths.get("config.properties");
-
     @Nullable
     @Override
     public JDA connect() {
         try {
             return JDABuilder
-                    .createDefault(Preconditions.checkNotNull(this.readToken(), "Unable to read discord token"))
+                    .createDefault(Preconditions.checkNotNull(
+                            DiscordConfigUtil.parseProperties().getProperty("discord-token"),
+                            "Unable to read discord token"
+                    ))
                     .setAutoReconnect(true)
                     .setEnableShutdownHook(true)
                     .setStatus(OnlineStatus.ONLINE)
                     .build()
                     .awaitReady();
         } catch (final LoginException | InterruptedException ex) {
-            ex.printStackTrace();
-        }
-
-        return null;
-    }
-
-    @Nullable
-    private String readToken() {
-        if (System.getProperties().containsKey("discord-token")) {
-            return System.getProperty("discord-token");
-        }
-
-        Properties properties = new Properties();
-
-        if (Files.notExists(CONFIG)) {
-            FileUtils.createNewFile(CONFIG);
-            properties.setProperty("discord-token", "null");
-
-            try (OutputStream stream = Files.newOutputStream(CONFIG)) {
-                properties.store(stream, "default configuration file");
-            } catch (final IOException ex) {
-                ex.printStackTrace();
-            }
-
-            return null;
-        }
-
-        try (InputStream stream = Files.newInputStream(CONFIG)) {
-            properties.load(stream);
-            return properties.getProperty("discord-token");
-        } catch (final IOException ex) {
             ex.printStackTrace();
         }
 

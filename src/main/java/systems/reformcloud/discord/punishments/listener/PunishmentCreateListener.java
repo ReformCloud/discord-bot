@@ -29,9 +29,13 @@ import systems.reformcloud.bot.Bot;
 import systems.reformcloud.discord.DiscordUtil;
 import systems.reformcloud.discord.features.logger.LoggerFeature;
 import systems.reformcloud.events.annotations.Subscribe;
+import systems.reformcloud.user.punish.DefaultPunishmentTypes;
 import systems.reformcloud.user.punish.event.PunishmentCreateEvent;
 import systems.reformcloud.util.Constants;
 import systems.reformcloud.util.KeyValueHolder;
+import systems.reformcloud.util.ThreadSupport;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * Represents a listener which hears to the punishment creates of the discord provider
@@ -59,7 +63,7 @@ public final class PunishmentCreateListener {
             return;
         }
 
-        var discordMember = DiscordUtil.getGuild().getMemberById(user.getId());
+        var discordMember = DiscordUtil.getGuild().retrieveMemberById(user.getId()).submit().join();
         if (discordMember == null) {
             return;
         }
@@ -74,7 +78,6 @@ public final class PunishmentCreateListener {
                 new KeyValueHolder<>("reason", event.getPunishment().getReason())
         );
 
-        DiscordUtil.getGuild().addRoleToMember(discordMember, DiscordUtil.getPunishedRole()).queue();
         discordMember.getUser().openPrivateChannel().queue(
                 e -> {
                     e.sendMessage("You have been punished on " + DiscordUtil.getGuild().getName()).queue();
@@ -85,5 +88,13 @@ public final class PunishmentCreateListener {
                 error -> {
                 }
         );
+
+        ThreadSupport.sleep(TimeUnit.SECONDS, 5);
+
+        if (event.getPunishment().getPunishmentType().equals(DefaultPunishmentTypes.MUTE.name())) {
+            DiscordUtil.getGuild().addRoleToMember(discordMember, DiscordUtil.getPunishedRole()).queue();
+        } else if (event.getPunishment().getPunishmentType().equals(DefaultPunishmentTypes.BAN.name())) {
+            DiscordUtil.getGuild().ban(discordMember, 5, event.getPunishment().getReason()).queue();
+        }
     }
 }

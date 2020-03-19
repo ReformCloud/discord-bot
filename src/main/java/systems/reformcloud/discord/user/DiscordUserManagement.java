@@ -43,6 +43,10 @@ import java.time.Duration;
  */
 public class DiscordUserManagement implements UserManagement {
 
+    static {
+        GlobalAPI.getDatabaseDriver().createTable("DISCORD_USERS");
+    }
+
     private final Cache<Long, User> userCache = CacheBuilder
             .newBuilder()
             .initialCapacity(10000)

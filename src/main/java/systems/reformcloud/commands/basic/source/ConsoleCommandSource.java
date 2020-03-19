@@ -42,6 +42,16 @@ public class ConsoleCommandSource implements CommandSource {
     }
 
     @Override
+    public boolean hasPermission(@NotNull Object permission) {
+        return true;
+    }
+
+    @Override
+    public long getId() {
+        return 0;
+    }
+
+    @Override
     public @NotNull
     String getName() {
         return "ConsoleCommandSource";

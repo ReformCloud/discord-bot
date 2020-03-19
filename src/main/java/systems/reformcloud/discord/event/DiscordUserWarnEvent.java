@@ -21,34 +21,51 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package systems.reformcloud.discord.command;
+package systems.reformcloud.discord.event;
 
-import net.dv8tion.jda.api.entities.TextChannel;
-import org.jetbrains.annotations.NotNull;
+import net.dv8tion.jda.api.JDA;
+import systems.reformcloud.bot.Bot;
 import systems.reformcloud.commands.source.CommandSource;
+import systems.reformcloud.events.Event;
+import systems.reformcloud.user.User;
+import systems.reformcloud.user.warn.Warn;
 
 /**
- * Represents the discord command sender
+ * This event gets called when an user gets warned
  *
  * @author Pasqual Koschmieder
  * @since 1.0
  */
-public final class DiscordCommandSource implements CommandSource {
+public class DiscordUserWarnEvent extends Event {
 
-    public DiscordCommandSource(TextChannel textChannel) {
-        this.textChannel = textChannel;
+    public DiscordUserWarnEvent(Warn warn, Bot<JDA> discordBot, CommandSource warner, User user) {
+        this.warn = warn;
+        this.discordBot = discordBot;
+        this.warner = warner;
+        this.user = user;
     }
 
-    private final TextChannel textChannel;
+    private final Warn warn;
 
-    @Override
-    public void sendMessage(@NotNull String message) {
-        this.textChannel.sendMessage(message).queue();
+    private final Bot<JDA> discordBot;
+
+    private final CommandSource warner;
+
+    private final User user;
+
+    public Warn getWarn() {
+        return warn;
     }
 
-    @NotNull
-    @Override
-    public String getName() {
-        return "DiscordCommandSource";
+    public Bot<JDA> getDiscordBot() {
+        return discordBot;
+    }
+
+    public CommandSource getWarner() {
+        return warner;
+    }
+
+    public User getUser() {
+        return user;
     }
 }

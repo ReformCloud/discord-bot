@@ -52,7 +52,7 @@ public interface CommandMap {
      *
      * @param command The command which should get registered
      */
-    void registerCommand(@NotNull Command command);
+    void registerCommand(@NotNull Command<Object> command);
 
     /**
      * Unregisters a command from the command map
@@ -76,5 +76,5 @@ public interface CommandMap {
      * @return All registered commands
      */
     @NotNull
-    Collection<Command> getRegisteredCommands();
+    Collection<Command<Object>> getRegisteredCommands();
 }

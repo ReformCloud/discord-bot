@@ -55,18 +55,18 @@ public final class PunishmentsDeleter {
         Constants.SCHEDULED_EXECUTOR_SERVICE.scheduleAtFixedRate(() -> {
             expiringPunishments.addAll(PunishmentsDatabaseReader.getExpiringPunishments(DefaultPunishmentTypes.MUTE.name()));
             expiringPunishments.addAll(PunishmentsDatabaseReader.getExpiringPunishments(DefaultPunishmentTypes.BAN.name()));
-        }, 0, 10, TimeUnit.MINUTES);
+        }, 0, 1, TimeUnit.MINUTES);
     }
 
     public static void startExpiredHandler() {
         Constants.SCHEDULED_EXECUTOR_SERVICE.scheduleAtFixedRate(() -> {
             expiringPunishments
                     .stream()
-                    .filter(e -> e.getTimeoutTime() >= System.currentTimeMillis())
+                    .filter(e -> e.getTimeoutTime() <= System.currentTimeMillis())
                     .forEach(e -> {
                         e.revoke();
                         expiringPunishments.remove(e);
                     });
-        }, 0, 10, TimeUnit.SECONDS);
+        }, 0, 1, TimeUnit.SECONDS);
     }
 }

@@ -21,34 +21,49 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package systems.reformcloud.commands.basic;
+package systems.reformcloud.discord.command.source;
 
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.TextChannel;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import systems.reformcloud.commands.basic.shared.SharedCommand;
-import systems.reformcloud.commands.basic.source.ConsoleCommandSource;
 import systems.reformcloud.commands.source.CommandSource;
 
 /**
- * A basic implementation of a command which is callable
+ * Represents the discord command sender
  *
  * @author Pasqual Koschmieder
  * @since 1.0
  */
-public abstract class BasicConsoleCommand extends SharedCommand<Object> {
+public final class DiscordCommandSource implements CommandSource {
 
-    public BasicConsoleCommand(String commandName, String[] aliases, String description) {
-        super(commandName, aliases, description);
+    public DiscordCommandSource(TextChannel textChannel, Member member) {
+        this.textChannel = textChannel;
+        this.member = member;
     }
 
-    @Nullable
+    private final TextChannel textChannel;
+
+    private final Member member;
+
     @Override
-    public String getPermission() {
-        return null;
+    public void sendMessage(@NotNull String message) {
+        this.textChannel.sendMessage(message).queue();
     }
 
     @Override
-    public boolean isAccessibleFrom(@NotNull CommandSource commandSource) {
-        return commandSource instanceof ConsoleCommandSource;
+    public boolean hasPermission(@NotNull Object permission) {
+        return permission instanceof Permission && member.hasPermission((Permission) permission);
+    }
+
+    @Override
+    public long getId() {
+        return member.getIdLong();
+    }
+
+    @NotNull
+    @Override
+    public String getName() {
+        return member.getUser().getName();
     }
 }

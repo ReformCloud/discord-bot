@@ -32,7 +32,7 @@ import systems.reformcloud.commands.Command;
  * @author Pasqual Koschmieder
  * @since 1.0
  */
-public abstract class SharedCommand implements Command {
+public abstract class SharedCommand<T> implements Command<T> {
 
     public SharedCommand(String commandName, String[] aliases, String description) {
         this.commandName = commandName;

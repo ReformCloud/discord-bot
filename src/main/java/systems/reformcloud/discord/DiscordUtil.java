@@ -23,12 +23,14 @@
  */
 package systems.reformcloud.discord;
 
-import com.google.common.base.Preconditions;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
 import org.jetbrains.annotations.NotNull;
+import systems.reformcloud.discord.config.DiscordConfigUtil;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * The discord punishment util
@@ -48,17 +50,24 @@ public final class DiscordUtil {
 
     private static Guild guild;
 
+    private static int firstAutoMuteWarnCount;
+
+    private static int secondAutoMuteWarnCount;
+
+    private static int autoBanWarnCount;
+
     public static void init(@NotNull JDA parent) {
-        var guildID = Preconditions.checkNotNull(System.getProperty("discord-guild"), "Unable to load discord guild id");
-        guild = Preconditions.checkNotNull(parent.getGuildById(guildID), "Unable to find guild with id %s", guildID);
+        guild = checkNotNull(parent.getGuildById(getNonNull("discord-guild")), "Unable to find guild");
 
-        var roleId = Preconditions.checkNotNull(System.getProperty("discord-punish-role"), "Unable to load discord punish role");
-        punishedRole = Preconditions.checkNotNull(guild.getRoleById(roleId), "Unable to find role with id %s", roleId);
+        punishedRole = checkNotNull(guild.getRoleById(getNonNull("discord-punish-role")),
+                "Unable to find punished role");
 
-        var loggingChannelID = Preconditions.checkNotNull(System.getProperty("discord-log-channel"),
-                "Unable to load discord log channel id");
-        loggingChannel = Preconditions.checkNotNull(guild.getTextChannelById(loggingChannelID),
-                "Unable to find text channel with id %s", loggingChannelID);
+        loggingChannel = checkNotNull(guild.getTextChannelById(getNonNull("discord-log-channel")),
+                "Unable to find logging text channel");
+
+        firstAutoMuteWarnCount = getInteger("discord-auto-mute-first");
+        secondAutoMuteWarnCount = getInteger("discord-auto-mute-second");
+        autoBanWarnCount = getInteger("discord-auto-ban");
     }
 
     @NotNull
@@ -74,5 +83,26 @@ public final class DiscordUtil {
     @NotNull
     public static Guild getGuild() {
         return guild;
+    }
+
+    public static int getFirstAutoMuteWarnCount() {
+        return firstAutoMuteWarnCount;
+    }
+
+    public static int getSecondAutoMuteWarnCount() {
+        return secondAutoMuteWarnCount;
+    }
+
+    public static int getAutoBanWarnCount() {
+        return autoBanWarnCount;
+    }
+
+    @NotNull
+    private static String getNonNull(String path) {
+        return checkNotNull(DiscordConfigUtil.parseProperties().getProperty(path));
+    }
+
+    private static int getInteger(String path) {
+        return Integer.parseInt(getNonNull(path));
     }
 }

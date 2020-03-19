@@ -40,4 +40,17 @@ public interface CommandSource extends Nameable {
      * @param message The message which should get sent
      */
     void sendMessage(@NotNull String message);
+
+    /**
+     * Checks if the current command source has the given permission
+     *
+     * @param permission The permission which has to be present
+     * @return If the user has the given permission
+     */
+    boolean hasPermission(@NotNull Object permission);
+
+    /**
+     * @return The id of the command source
+     */
+    long getId();
 }

@@ -23,9 +23,12 @@
  */
 package systems.reformcloud.discord.command;
 
+import net.dv8tion.jda.api.Permission;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import systems.reformcloud.commands.basic.shared.SharedCommand;
 import systems.reformcloud.commands.source.CommandSource;
+import systems.reformcloud.discord.command.source.DiscordCommandSource;
 
 /**
  * Represents a command which can get executed from the discord server
@@ -33,10 +36,16 @@ import systems.reformcloud.commands.source.CommandSource;
  * @author Pasqual Koschmieder
  * @since 1.0
  */
-public abstract class BasicDiscordCommand extends SharedCommand {
+public abstract class BasicDiscordCommand extends SharedCommand<Object> {
 
     public BasicDiscordCommand(String commandName, String[] aliases, String description) {
         super(commandName, aliases, description);
+    }
+
+    @Nullable
+    @Override
+    public Permission getPermission() {
+        return null;
     }
 
     @Override

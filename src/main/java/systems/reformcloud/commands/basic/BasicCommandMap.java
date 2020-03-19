@@ -43,10 +43,10 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public class BasicCommandMap implements CommandMap {
 
-    private final Collection<Command> commands = new CopyOnWriteArrayList<>();
+    private final Collection<Command<Object>> commands = new CopyOnWriteArrayList<>();
 
     @Override
-    public void registerCommand(@NotNull Command command) {
+    public void registerCommand(@NotNull Command<Object> command) {
         this.commands.add(command);
     }
 
@@ -58,7 +58,7 @@ public class BasicCommandMap implements CommandMap {
     @Override
     public boolean dispatchCommand(@NotNull CommandSource source, @NotNull String commandLine) {
         String[] split = commandLine.split(" ");
-        Optional<Command> command = findMatching(split[0]);
+        Optional<Command<Object>> command = findMatching(split[0]);
         if (command.isEmpty()) {
             return false;
         }
@@ -80,11 +80,11 @@ public class BasicCommandMap implements CommandMap {
 
     @Override
     public @NotNull
-    Collection<Command> getRegisteredCommands() {
+    Collection<Command<Object>> getRegisteredCommands() {
         return this.commands;
     }
 
-    private Optional<Command> findMatching(String commandLabel) {
+    private Optional<Command<Object>> findMatching(String commandLabel) {
         return this.commands.stream()
                 .filter(e -> e.getCommandName().equalsIgnoreCase(commandLabel)
                         || Arrays.stream(e.getAliases()).anyMatch(alias -> alias.equalsIgnoreCase(commandLabel)))

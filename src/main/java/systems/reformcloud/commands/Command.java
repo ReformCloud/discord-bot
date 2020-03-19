@@ -24,6 +24,7 @@
 package systems.reformcloud.commands;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import systems.reformcloud.commands.source.CommandSource;
 
 /**
@@ -32,7 +33,7 @@ import systems.reformcloud.commands.source.CommandSource;
  * @author Pasqual Koschmieder
  * @since 1.0
  */
-public interface Command {
+public interface Command<T> {
 
     /**
      * @return The main name of the command
@@ -51,6 +52,12 @@ public interface Command {
      */
     @NotNull
     String getDescription();
+
+    /**
+     * @return The permission which is required to run the command or {@code null} if noi permission is required
+     */
+    @Nullable
+    T getPermission();
 
     /**
      * Checks if the current command is accessible from the given command source

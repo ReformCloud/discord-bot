@@ -30,8 +30,10 @@ import systems.reformcloud.api.GlobalAPI;
 import systems.reformcloud.bot.Bot;
 import systems.reformcloud.bot.BotConnectionHandler;
 import systems.reformcloud.bot.feature.BotFeature;
+import systems.reformcloud.discord.command.commands.WarnCommand;
 import systems.reformcloud.discord.features.CommandHandlerFeature;
 import systems.reformcloud.discord.features.logger.LoggerFeature;
+import systems.reformcloud.discord.listener.DiscordWarnCreateListener;
 import systems.reformcloud.discord.punishments.listener.PunishmentCreateListener;
 import systems.reformcloud.discord.punishments.listener.PunishmentRevokeListener;
 import systems.reformcloud.discord.user.DiscordUserManagement;
@@ -67,6 +69,9 @@ public class DiscordBot implements Bot<JDA> {
 
         GlobalAPI.getEventManager().registerListener(new PunishmentRevokeListener(this));
         GlobalAPI.getEventManager().registerListener(new PunishmentCreateListener(this));
+        GlobalAPI.getEventManager().registerListener(new DiscordWarnCreateListener());
+
+        GlobalAPI.getCommandMap().registerCommand(new WarnCommand(this));
     }
 
     @Override

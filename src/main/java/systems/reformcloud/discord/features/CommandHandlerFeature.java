@@ -26,7 +26,7 @@ package systems.reformcloud.discord.features;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
 import systems.reformcloud.api.GlobalAPI;
-import systems.reformcloud.discord.command.DiscordCommandSource;
+import systems.reformcloud.discord.command.source.DiscordCommandSource;
 
 import javax.annotation.Nonnull;
 
@@ -46,6 +46,9 @@ public class CommandHandlerFeature extends DiscordFeature {
 
     @Override
     public void onGuildMessageReceived(@Nonnull GuildMessageReceivedEvent event) {
-        GlobalAPI.getCommandMap().dispatchCommand(new DiscordCommandSource(event.getChannel()), event.getMessage().getContentRaw());
+        GlobalAPI.getCommandMap().dispatchCommand(new DiscordCommandSource(
+                event.getChannel(),
+                event.getMember()
+        ), event.getMessage().getContentRaw());
     }
 }

@@ -29,6 +29,7 @@ import systems.reformcloud.bot.Bot;
 import systems.reformcloud.discord.DiscordUtil;
 import systems.reformcloud.discord.features.logger.LoggerFeature;
 import systems.reformcloud.events.annotations.Subscribe;
+import systems.reformcloud.user.punish.DefaultPunishmentTypes;
 import systems.reformcloud.user.punish.event.PunishmentRevokeEvent;
 import systems.reformcloud.util.Constants;
 import systems.reformcloud.util.KeyValueHolder;
@@ -49,9 +50,15 @@ public final class PunishmentRevokeListener {
 
     @Subscribe
     public void handle(final PunishmentRevokeEvent event) {
+        System.out.println("Called punish revoke");
+
         if (!event.getPunishment().getProvider().equals("discord")
                 || bot.getCurrentInstance().isEmpty()) {
             return;
+        }
+
+        if (event.getPunishment().getPunishmentType().equals(DefaultPunishmentTypes.BAN.name())) {
+            DiscordUtil.getGuild().unban(Long.toUnsignedString(event.getPunishment().getUserID())).queue();
         }
 
         var user = bot.getAssociatedUserManagement().getExistingUserById(event.getPunishment().getUserID());
@@ -59,9 +66,13 @@ public final class PunishmentRevokeListener {
             return;
         }
 
-        var discordMember = DiscordUtil.getGuild().getMemberById(user.getId());
+        var discordMember = DiscordUtil.getGuild().retrieveMemberById(user.getId()).submit().join();
         if (discordMember == null) {
             return;
+        }
+
+        if (event.getPunishment().getPunishmentType().equals(DefaultPunishmentTypes.MUTE.name())) {
+            DiscordUtil.getGuild().removeRoleFromMember(discordMember, DiscordUtil.getPunishedRole()).queue();
         }
 
         LoggerFeature.log(
@@ -72,7 +83,6 @@ public final class PunishmentRevokeListener {
                 new KeyValueHolder<>("reason", event.getPunishment().getReason())
         );
 
-        DiscordUtil.getGuild().removeRoleFromMember(discordMember, DiscordUtil.getPunishedRole()).queue();
         discordMember.getUser().openPrivateChannel().queue(
                 e -> e.sendMessage("Your punishment on " + DiscordUtil.getGuild().getName() + " has been revoked").queue(),
                 error -> {
