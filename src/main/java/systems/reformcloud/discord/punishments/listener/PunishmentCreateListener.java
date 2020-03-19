@@ -63,38 +63,40 @@ public final class PunishmentCreateListener {
             return;
         }
 
-        var discordMember = DiscordUtil.getGuild().retrieveMemberById(user.getId()).submit().join();
-        if (discordMember == null) {
-            return;
-        }
+        DiscordUtil.getGuild().retrieveMemberById(user.getId()).queue(discordMember -> {
+            if (discordMember == null) {
+                return;
+            }
 
-        LoggerFeature.log(
-                "Created punishment #" + event.getPunishment().getUniqueID() + " for user " + discordMember.getUser().getName(),
-                new KeyValueHolder<>("punish time", Constants.DATE_FORMAT.format(event.getPunishment().getMilliTime())),
-                new KeyValueHolder<>("timeout", event.getPunishment().isPermanent() ? "never"
-                        : Constants.DATE_FORMAT.format(event.getPunishment().getTimeoutTime())),
-                new KeyValueHolder<>("punish type", event.getPunishment().getPunishmentType()),
-                new KeyValueHolder<>("warner", event.getPunishment().getWarnerName() + " (" + event.getPunishment().getWarner() + ")"),
-                new KeyValueHolder<>("reason", event.getPunishment().getReason())
-        );
+            LoggerFeature.log(
+                    "Created punishment #" + event.getPunishment().getUniqueID() + " for user " + discordMember.getUser().getName(),
+                    new KeyValueHolder<>("punish time", Constants.DATE_FORMAT.format(event.getPunishment().getMilliTime())),
+                    new KeyValueHolder<>("timeout", event.getPunishment().isPermanent() ? "never"
+                            : Constants.DATE_FORMAT.format(event.getPunishment().getTimeoutTime())),
+                    new KeyValueHolder<>("punish type", event.getPunishment().getPunishmentType()),
+                    new KeyValueHolder<>("warner", event.getPunishment().getWarnerName() + " (" + event.getPunishment().getWarner() + ")"),
+                    new KeyValueHolder<>("reason", event.getPunishment().getReason())
+            );
 
-        discordMember.getUser().openPrivateChannel().queue(
-                e -> {
-                    e.sendMessage("You have been punished on " + DiscordUtil.getGuild().getName()).queue();
-                    e.sendMessage("This punishment will be revoked at: " + (event.getPunishment().isPermanent() ? "never"
-                            : Constants.DATE_FORMAT.format(event.getPunishment().getTimeoutTime()))).queue();
-                    e.sendMessage("The reason for the punishment was: " + event.getPunishment().getReason()).queue();
-                },
-                error -> {
-                }
-        );
+            discordMember.getUser().openPrivateChannel().queue(
+                    e -> {
+                        e.sendMessage("You have been punished on " + DiscordUtil.getGuild().getName()).queue();
+                        e.sendMessage("This punishment will be revoked at: " + (event.getPunishment().isPermanent() ? "never"
+                                : Constants.DATE_FORMAT.format(event.getPunishment().getTimeoutTime()))).queue();
+                        e.sendMessage("The reason for the punishment was: " + event.getPunishment().getReason()).queue();
+                    },
+                    error -> {
+                    }
+            );
 
-        ThreadSupport.sleep(TimeUnit.SECONDS, 5);
+            ThreadSupport.sleep(TimeUnit.SECONDS, 5);
 
-        if (event.getPunishment().getPunishmentType().equals(DefaultPunishmentTypes.MUTE.name())) {
-            DiscordUtil.getGuild().addRoleToMember(discordMember, DiscordUtil.getPunishedRole()).queue();
-        } else if (event.getPunishment().getPunishmentType().equals(DefaultPunishmentTypes.BAN.name())) {
-            DiscordUtil.getGuild().ban(discordMember, 5, event.getPunishment().getReason()).queue();
-        }
+            if (event.getPunishment().getPunishmentType().equals(DefaultPunishmentTypes.MUTE.name())) {
+                DiscordUtil.getGuild().addRoleToMember(discordMember, DiscordUtil.getPunishedRole()).queue();
+            } else if (event.getPunishment().getPunishmentType().equals(DefaultPunishmentTypes.BAN.name())) {
+                DiscordUtil.getGuild().ban(discordMember, 5, event.getPunishment().getReason()).queue();
+            }
+        }, error -> {
+        });
     }
 }

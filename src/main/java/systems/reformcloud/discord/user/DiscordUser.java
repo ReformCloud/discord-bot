@@ -98,8 +98,8 @@ public class DiscordUser implements User {
                 .stream()
                 .filter(e -> e.getUniqueID().equals(uniqueID))
                 .forEach(e -> {
-                    e.revoke();
                     punishments.remove(e);
+                    e.revoke();
                 });
     }
 

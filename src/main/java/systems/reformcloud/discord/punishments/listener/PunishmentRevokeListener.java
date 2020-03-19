@@ -64,30 +64,38 @@ public final class PunishmentRevokeListener {
             return;
         }
 
-        user.removePunishmentByUniqueId(event.getPunishment().getUniqueID());
-        this.bot.getAssociatedUserManagement().updateUser(user);
+        user.getPunishments()
+                .stream()
+                .filter(e -> e.getUniqueID().equals(event.getPunishment().getUniqueID()))
+                .findAny()
+                .ifPresent(e -> {
+                    user.getPunishments().remove(e);
+                    this.bot.getAssociatedUserManagement().updateUser(user);
+                });
 
-        var discordMember = DiscordUtil.getGuild().retrieveMemberById(user.getId()).submit().join();
-        if (discordMember == null) {
-            return;
-        }
+        DiscordUtil.getGuild().retrieveMemberById(user.getId()).queue(discordMember -> {
+            if (discordMember == null) {
+                return;
+            }
 
-        if (event.getPunishment().getPunishmentType().equals(DefaultPunishmentTypes.MUTE.name())) {
-            DiscordUtil.getGuild().removeRoleFromMember(discordMember, DiscordUtil.getPunishedRole()).queue();
-        }
+            if (event.getPunishment().getPunishmentType().equals(DefaultPunishmentTypes.MUTE.name())) {
+                DiscordUtil.getGuild().removeRoleFromMember(discordMember, DiscordUtil.getPunishedRole()).queue();
+            }
 
-        LoggerFeature.log(
-                "Revoked punishment #" + event.getPunishment().getUniqueID() + " from user " + discordMember.getUser().getName(),
-                new KeyValueHolder<>("punish time", Constants.DATE_FORMAT.format(event.getPunishment().getMilliTime())),
-                new KeyValueHolder<>("punish type", event.getPunishment().getPunishmentType()),
-                new KeyValueHolder<>("warner", event.getPunishment().getWarnerName() + " (" + event.getPunishment().getWarner() + ")"),
-                new KeyValueHolder<>("reason", event.getPunishment().getReason())
-        );
+            LoggerFeature.log(
+                    "Revoked punishment #" + event.getPunishment().getUniqueID() + " from user " + discordMember.getUser().getName(),
+                    new KeyValueHolder<>("punish time", Constants.DATE_FORMAT.format(event.getPunishment().getMilliTime())),
+                    new KeyValueHolder<>("punish type", event.getPunishment().getPunishmentType()),
+                    new KeyValueHolder<>("warner", event.getPunishment().getWarnerName() + " (" + event.getPunishment().getWarner() + ")"),
+                    new KeyValueHolder<>("reason", event.getPunishment().getReason())
+            );
 
-        discordMember.getUser().openPrivateChannel().queue(
-                e -> e.sendMessage("Your punishment on " + DiscordUtil.getGuild().getName() + " has been revoked").queue(),
-                error -> {
-                }
-        );
+            discordMember.getUser().openPrivateChannel().queue(
+                    e -> e.sendMessage("Your punishment on " + DiscordUtil.getGuild().getName() + " has been revoked").queue(),
+                    error -> {
+                    }
+            );
+        }, error -> {
+        });
     }
 }

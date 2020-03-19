@@ -30,10 +30,7 @@ import systems.reformcloud.api.GlobalAPI;
 import systems.reformcloud.bot.Bot;
 import systems.reformcloud.bot.BotConnectionHandler;
 import systems.reformcloud.bot.feature.BotFeature;
-import systems.reformcloud.discord.command.commands.DeleteWarnCommand;
-import systems.reformcloud.discord.command.commands.ListWarnsCommand;
-import systems.reformcloud.discord.command.commands.PunishCommand;
-import systems.reformcloud.discord.command.commands.WarnCommand;
+import systems.reformcloud.discord.command.commands.*;
 import systems.reformcloud.discord.features.CommandHandlerFeature;
 import systems.reformcloud.discord.features.logger.LoggerFeature;
 import systems.reformcloud.discord.listener.DiscordUserJoinListener;
@@ -101,6 +98,8 @@ public class DiscordBot implements Bot<JDA> {
         GlobalAPI.getCommandMap().registerCommand(new ListWarnsCommand(this));
         GlobalAPI.getCommandMap().registerCommand(new DeleteWarnCommand(this));
         GlobalAPI.getCommandMap().registerCommand(new PunishCommand(this));
+        GlobalAPI.getCommandMap().registerCommand(new ListPunishmentsCommand(this));
+        GlobalAPI.getCommandMap().registerCommand(new DeletePunishCommand(this));
     }
 
     @Override

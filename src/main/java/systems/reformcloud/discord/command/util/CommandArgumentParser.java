@@ -31,6 +31,7 @@ import systems.reformcloud.commands.source.CommandSource;
 import systems.reformcloud.user.User;
 
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 /**
  * A small util to parse some command arguments
@@ -70,6 +71,28 @@ public final class CommandArgumentParser {
             return UUID.fromString(argument);
         } catch (final IllegalArgumentException ex) {
             return null;
+        }
+    }
+
+    @Nullable
+    public static Long parseLong(@NotNull String argument) {
+        try {
+            return Long.parseLong(argument);
+        } catch (final NumberFormatException ex) {
+            return null;
+        }
+    }
+
+    public static TimeUnit parseTimeUnit(@NotNull String argument) {
+        switch (argument.toLowerCase()) {
+            case "d":
+                return TimeUnit.DAYS;
+
+            case "h":
+                return TimeUnit.HOURS;
+
+            default:
+                return null;
         }
     }
 

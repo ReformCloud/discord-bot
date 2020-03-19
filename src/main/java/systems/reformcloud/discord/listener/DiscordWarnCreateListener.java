@@ -52,6 +52,10 @@ public class DiscordWarnCreateListener {
         }, error -> {
         });
 
+        if (!event.getUser().getPunishments().isEmpty()) {
+            return;
+        }
+
         if (event.getUser().getWarns().size() == DiscordUtil.getFirstAutoMuteWarnCount()) {
             event.getUser().getPunishments().add(new DiscordPunishment(
                     member.getIdLong(),
