@@ -41,6 +41,7 @@ import systems.reformcloud.discord.punishments.listener.PunishmentCreateListener
 import systems.reformcloud.discord.punishments.listener.PunishmentRevokeListener;
 import systems.reformcloud.discord.user.DiscordUserManagement;
 import systems.reformcloud.user.UserManagement;
+import systems.reformcloud.user.punish.DefaultPunishmentTypes;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -64,6 +65,20 @@ public class DiscordBot implements Bot<JDA> {
         this.userManagement = new DiscordUserManagement();
 
         DiscordUtil.init(this.jda);
+        DiscordUtil.getGuild().retrieveMembers().join();
+        DiscordUtil.getGuild().getMembers()
+                .stream()
+                .filter(e -> e.getRoles().size() == 0)
+                .forEach(e -> {
+                    var user = this.userManagement.getUserOrCreate(e.getIdLong());
+                    if (user.getPunishments().size() > 0 && user.getPunishments()
+                            .stream()
+                            .anyMatch(p -> p.getPunishmentType().equals(DefaultPunishmentTypes.MUTE.name()))) {
+                        DiscordUtil.getGuild().addRoleToMember(e, DiscordUtil.getPunishedRole()).queue();
+                    }
+
+                    DiscordUtil.getGuild().addRoleToMember(e, DiscordUtil.getMemberRole()).queue();
+                });
 
         this.init(Arrays.asList(
                 new CommandHandlerFeature(),
