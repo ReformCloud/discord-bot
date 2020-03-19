@@ -23,6 +23,7 @@
  */
 package systems.reformcloud.user.punish.util;
 
+import systems.reformcloud.api.GlobalAPI;
 import systems.reformcloud.user.punish.DefaultPunishmentTypes;
 import systems.reformcloud.user.punish.Punishment;
 import systems.reformcloud.util.Constants;
@@ -47,6 +48,10 @@ public final class PunishmentsDeleter {
     private static Collection<Punishment> expiringPunishments = new CopyOnWriteArrayList<>();
 
     public static void startReload() {
+        for (DefaultPunishmentTypes type : DefaultPunishmentTypes.values()) {
+            GlobalAPI.getDatabaseDriver().createTable("punishments_" + type);
+        }
+
         Constants.SCHEDULED_EXECUTOR_SERVICE.scheduleAtFixedRate(() -> {
             expiringPunishments.addAll(PunishmentsDatabaseReader.getExpiringPunishments(DefaultPunishmentTypes.MUTE.name()));
             expiringPunishments.addAll(PunishmentsDatabaseReader.getExpiringPunishments(DefaultPunishmentTypes.BAN.name()));

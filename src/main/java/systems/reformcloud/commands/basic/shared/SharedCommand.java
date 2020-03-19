@@ -21,38 +21,46 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package systems.reformcloud.util;
+package systems.reformcloud.commands.basic.shared;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
+import org.jetbrains.annotations.NotNull;
+import systems.reformcloud.commands.Command;
 
 /**
- * Some constant values for the bot
+ * A basic implementation of a command
  *
  * @author Pasqual Koschmieder
  * @since 1.0
  */
-public final class Constants {
+public abstract class SharedCommand implements Command {
 
-    private Constants() {
-        throw new UnsupportedOperationException();
+    public SharedCommand(String commandName, String[] aliases, String description) {
+        this.commandName = commandName;
+        this.aliases = aliases;
+        this.description = description;
     }
 
-    /**
-     * The basic date format used in the system
-     */
-    public static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+    private final String commandName;
 
-    /**
-     * The executor service to supply the async tasks to
-     */
-    public static final ExecutorService EXECUTOR_SERVICE = Executors.newCachedThreadPool();
+    private final String[] aliases;
 
-    /**
-     * The executor service for scheduled tasks
-     */
-    public static final ScheduledExecutorService SCHEDULED_EXECUTOR_SERVICE = Executors.newSingleThreadScheduledExecutor();
+    private final String description;
+
+    @Override
+    public @NotNull
+    String getCommandName() {
+        return this.commandName;
+    }
+
+    @Override
+    public @NotNull
+    String[] getAliases() {
+        return this.aliases;
+    }
+
+    @Override
+    public @NotNull
+    String getDescription() {
+        return this.description;
+    }
 }

@@ -58,7 +58,7 @@ public class BasicTerminalConsole extends TerminalConsole {
 
         FileUtils.createDirectories(Paths.get("logs"));
 
-        FileHandler fileHandler = new FileHandler("logs/cloud.log", 70000000, 8, true);
+        FileHandler fileHandler = new FileHandler("logs/bot.log", 70000000, 8, true);
         fileHandler.setLevel(Level.ALL);
         fileHandler.setFormatter(new BasicLogFormatter(this));
         addHandler(fileHandler);

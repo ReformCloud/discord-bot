@@ -21,38 +21,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package systems.reformcloud.util;
+package systems.reformcloud.discord.command;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
+import org.jetbrains.annotations.NotNull;
+import systems.reformcloud.commands.basic.shared.SharedCommand;
+import systems.reformcloud.commands.source.CommandSource;
 
 /**
- * Some constant values for the bot
+ * Represents a command which can get executed from the discord server
  *
  * @author Pasqual Koschmieder
  * @since 1.0
  */
-public final class Constants {
+public abstract class BasicDiscordCommand extends SharedCommand {
 
-    private Constants() {
-        throw new UnsupportedOperationException();
+    public BasicDiscordCommand(String commandName, String[] aliases, String description) {
+        super(commandName, aliases, description);
     }
 
-    /**
-     * The basic date format used in the system
-     */
-    public static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-
-    /**
-     * The executor service to supply the async tasks to
-     */
-    public static final ExecutorService EXECUTOR_SERVICE = Executors.newCachedThreadPool();
-
-    /**
-     * The executor service for scheduled tasks
-     */
-    public static final ScheduledExecutorService SCHEDULED_EXECUTOR_SERVICE = Executors.newSingleThreadScheduledExecutor();
+    @Override
+    public boolean isAccessibleFrom(@NotNull CommandSource commandSource) {
+        return commandSource instanceof DiscordCommandSource;
+    }
 }

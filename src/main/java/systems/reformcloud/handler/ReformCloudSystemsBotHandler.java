@@ -29,6 +29,8 @@ import systems.reformcloud.api.GlobalAPI;
 import systems.reformcloud.bot.Bot;
 import systems.reformcloud.commands.CommandMap;
 import systems.reformcloud.commands.basic.BasicCommandMap;
+import systems.reformcloud.commands.basic.commands.HelpCommand;
+import systems.reformcloud.commands.basic.commands.StopCommand;
 import systems.reformcloud.database.DatabaseDriver;
 import systems.reformcloud.database.basic.H2DatabaseConfig;
 import systems.reformcloud.database.basic.H2DatabaseDriver;
@@ -55,6 +57,11 @@ public final class ReformCloudSystemsBotHandler {
     private Bot<JDA> discordBot;
 
     public ReformCloudSystemsBotHandler() {
+        GlobalAPI.setParent(this);
+
+        this.commandMap.registerCommand(new HelpCommand());
+        this.commandMap.registerCommand(new StopCommand());
+
         this.databaseDriver = new H2DatabaseDriver();
         this.databaseDriver.connect(new H2DatabaseConfig());
 
@@ -63,8 +70,6 @@ public final class ReformCloudSystemsBotHandler {
 
         PunishmentsDeleter.startReload();
         PunishmentsDeleter.startExpiredHandler();
-
-        GlobalAPI.setParent(this);
     }
 
     /**

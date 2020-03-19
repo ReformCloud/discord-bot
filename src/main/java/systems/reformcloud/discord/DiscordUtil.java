@@ -27,6 +27,7 @@ import com.google.common.base.Preconditions;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.TextChannel;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -43,19 +44,31 @@ public final class DiscordUtil {
 
     private static Role punishedRole;
 
+    private static TextChannel loggingChannel;
+
     private static Guild guild;
 
     public static void init(@NotNull JDA parent) {
-        var roleId = Preconditions.checkNotNull(System.getProperty("discord-punish-role"), "Unable to load discord punish role");
-        punishedRole = Preconditions.checkNotNull(parent.getRoleById(roleId), "Unable to find role with id %s", roleId);
-
         var guildID = Preconditions.checkNotNull(System.getProperty("discord-guild"), "Unable to load discord guild id");
-        guild = Preconditions.checkNotNull(parent.getGuildById(guildID), "Unable to find guild with id %s", roleId);
+        guild = Preconditions.checkNotNull(parent.getGuildById(guildID), "Unable to find guild with id %s", guildID);
+
+        var roleId = Preconditions.checkNotNull(System.getProperty("discord-punish-role"), "Unable to load discord punish role");
+        punishedRole = Preconditions.checkNotNull(guild.getRoleById(roleId), "Unable to find role with id %s", roleId);
+
+        var loggingChannelID = Preconditions.checkNotNull(System.getProperty("discord-log-channel"),
+                "Unable to load discord log channel id");
+        loggingChannel = Preconditions.checkNotNull(guild.getTextChannelById(loggingChannelID),
+                "Unable to find text channel with id %s", loggingChannelID);
     }
 
     @NotNull
     public static Role getPunishedRole() {
         return punishedRole;
+    }
+
+    @NotNull
+    public static TextChannel getLoggingChannel() {
+        return loggingChannel;
     }
 
     @NotNull

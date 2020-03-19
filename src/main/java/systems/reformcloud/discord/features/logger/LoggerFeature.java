@@ -28,7 +28,6 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.guild.GuildBanEvent;
 import net.dv8tion.jda.api.events.guild.GuildUnbanEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
@@ -41,6 +40,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import systems.reformcloud.api.GlobalAPI;
 import systems.reformcloud.bot.Bot;
+import systems.reformcloud.discord.DiscordUtil;
 import systems.reformcloud.discord.features.DiscordFeature;
 import systems.reformcloud.util.Constants;
 import systems.reformcloud.util.KeyValueHolder;
@@ -67,34 +67,26 @@ public class LoggerFeature extends DiscordFeature {
             .ticker(Ticker.systemTicker())
             .build();
 
-    public static TextChannel channel;
-
     @Override
     public void handleStart(@NotNull Bot<JDA> bot) {
-        var channel = System.getProperty("discord-log-channel");
-        if (channel == null) {
-            return;
-        }
+        GlobalAPI.getDatabaseDriver().createTable("discord_messages");
 
         bot.getCurrentInstance().ifPresent(e -> {
-            LoggerFeature.channel = e.getTextChannelById(channel);
             Constants.SCHEDULED_EXECUTOR_SERVICE.scheduleAtFixedRate(() -> {
                 GlobalAPI.getDatabaseDriver().getAll(
                         "discord_messages",
                         GuildMessageDatabaseObjectToken.MAPPER
-                ).stream().filter(m -> m.getCreationTime() + TimeUnit.DAYS.toMillis(30) > System.currentTimeMillis()).forEach(message -> {
-                    GlobalAPI.getDatabaseDriver().deleteFromTable("discord_messages", Long.toString(message.getMessageId()));
-                    System.out.println("Cleaned message " + message.getMessageId() + " from database");
-                });
+                )
+                        .stream()
+                        .filter(m -> (m.getCreationTime() + TimeUnit.DAYS.toMillis(30)) < System.currentTimeMillis())
+                        .forEach(message -> {
+                            GlobalAPI.getDatabaseDriver().deleteFromTable("discord_messages", Long.toString(message.getMessageId()));
+                            System.out.println("Cleaned message " + message.getMessageId() + " from database");
+                        });
             }, 0, 12, TimeUnit.HOURS);
 
             super.handleStart(bot);
         });
-    }
-
-    @Override
-    public boolean isInitialized() {
-        return super.isInitialized() && channel != null;
     }
 
     @NotNull
@@ -136,7 +128,6 @@ public class LoggerFeature extends DiscordFeature {
             GlobalAPI.getDatabaseDriver().update(message);
 
             log(
-                    channel,
                     event.getMessage().getAuthor().getName() + " updated message from "
                             + Constants.DATE_FORMAT.format(oldMessage.getCreationTime()),
                     new KeyValueHolder<>("Message before", oldMessage.getMessage()),
@@ -153,17 +144,22 @@ public class LoggerFeature extends DiscordFeature {
                 return;
             }
 
-            var user = event.getJDA().getUserById(message.getUserId());
+            event.getJDA().retrieveUserById(message.getUserId()).queue(user -> {
+                log(
+                        "User " + user.getName() + " deleted a message",
+                        new KeyValueHolder<>("last edited", Constants.DATE_FORMAT.format(message.getCreationTime())),
+                        new KeyValueHolder<>("message", message.getMessage())
+                );
+            }, error -> {
+                log(
+                        "Unknown user deleted a message",
+                        new KeyValueHolder<>("last edited", Constants.DATE_FORMAT.format(message.getCreationTime())),
+                        new KeyValueHolder<>("message", message.getMessage())
+                );
+            });
 
             this.messageCache.invalidate(message.getMessageId());
             GlobalAPI.getDatabaseDriver().deleteFromTable(message);
-
-            log(
-                    channel,
-                    "User " + (user == null ? "unknown" : user.getName()) + " deleted a message",
-                    new KeyValueHolder<>("last edited", Constants.DATE_FORMAT.format(message.getCreationTime())),
-                    new KeyValueHolder<>("message", message.getMessage())
-            );
         });
     }
 
@@ -183,7 +179,6 @@ public class LoggerFeature extends DiscordFeature {
 
                 this.getApi().getAssociatedUserManagement().updateUser(systemUser);
                 log(
-                        channel,
                         "A new user joined the discord server (" + event.getMember().getUser().getName() + ")",
                         new KeyValueHolder<>("id", Long.toString(systemUser.getId()))
                 );
@@ -195,7 +190,6 @@ public class LoggerFeature extends DiscordFeature {
             this.getApi().getAssociatedUserManagement().updateUser(systemUser);
 
             log(
-                    channel,
                     "An old user joined the discord again (" + event.getMember().getUser().getName() + ")",
                     new KeyValueHolder<>("id", Long.toString(systemUser.getId())),
                     new KeyValueHolder<>("first join", Constants.DATE_FORMAT.format(systemUser.getInformation().getFirstJoinTimeInMillis())),
@@ -215,7 +209,6 @@ public class LoggerFeature extends DiscordFeature {
             }
 
             log(
-                    channel,
                     "The user " + event.getUser().getName() + " left the discord",
                     new KeyValueHolder<>("join time", Constants.DATE_FORMAT.format(systemUser.getInformation().getJoinTimeInMillis())),
                     new KeyValueHolder<>("total joins", Long.toString(systemUser.getInformation().getTotalJoins()))
@@ -233,7 +226,6 @@ public class LoggerFeature extends DiscordFeature {
             }
 
             log(
-                    channel,
                     "The user " + event.getUser().getName() + " got banned from the discord",
                     new KeyValueHolder<>("join time", Constants.DATE_FORMAT.format(systemUser.getInformation().getJoinTimeInMillis())),
                     new KeyValueHolder<>("total joins", Long.toString(systemUser.getInformation().getTotalJoins()))
@@ -251,7 +243,6 @@ public class LoggerFeature extends DiscordFeature {
             }
 
             log(
-                    channel,
                     "The user " + event.getUser().getName() + " got unbanned from the discord",
                     new KeyValueHolder<>("last join time", Constants.DATE_FORMAT.format(systemUser.getInformation().getJoinTimeInMillis())),
                     new KeyValueHolder<>("total joins", Long.toString(systemUser.getInformation().getTotalJoins()))
@@ -271,7 +262,7 @@ public class LoggerFeature extends DiscordFeature {
     }
 
     @SafeVarargs
-    public static void log(@NotNull TextChannel channel, @NotNull String message, @NotNull Map.Entry<String, String>... fieldMessages) {
+    public static void log(@NotNull String message, @NotNull Map.Entry<String, String>... fieldMessages) {
         EmbedBuilder builder = new EmbedBuilder()
                 .setColor(Color.RED)
                 .setAuthor("ReformCloudSystems")
@@ -286,6 +277,6 @@ public class LoggerFeature extends DiscordFeature {
             );
         }
 
-        channel.sendMessage(builder.build()).queue();
+        DiscordUtil.getLoggingChannel().sendMessage(builder.build()).queue();
     }
 }

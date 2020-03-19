@@ -50,8 +50,7 @@ public final class PunishmentCreateListener {
     @Subscribe
     public void handle(final PunishmentCreateEvent event) {
         if (!event.getPunishment().getProvider().equals("discord")
-                || bot.getCurrentInstance().isEmpty()
-                || LoggerFeature.channel == null) {
+                || bot.getCurrentInstance().isEmpty()) {
             return;
         }
 
@@ -66,7 +65,6 @@ public final class PunishmentCreateListener {
         }
 
         LoggerFeature.log(
-                LoggerFeature.channel,
                 "Created punishment #" + event.getPunishment().getUniqueID() + " for user " + discordMember.getUser().getName(),
                 new KeyValueHolder<>("punish time", Constants.DATE_FORMAT.format(event.getPunishment().getMilliTime())),
                 new KeyValueHolder<>("timeout", event.getPunishment().isPermanent() ? "never"

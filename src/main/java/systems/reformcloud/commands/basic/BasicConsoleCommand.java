@@ -24,7 +24,7 @@
 package systems.reformcloud.commands.basic;
 
 import org.jetbrains.annotations.NotNull;
-import systems.reformcloud.commands.Command;
+import systems.reformcloud.commands.basic.shared.SharedCommand;
 import systems.reformcloud.commands.basic.source.ConsoleCommandSource;
 import systems.reformcloud.commands.source.CommandSource;
 
@@ -34,36 +34,10 @@ import systems.reformcloud.commands.source.CommandSource;
  * @author Pasqual Koschmieder
  * @since 1.0
  */
-public abstract class BasicConsoleCommand implements Command {
+public abstract class BasicConsoleCommand extends SharedCommand {
 
     public BasicConsoleCommand(String commandName, String[] aliases, String description) {
-        this.commandName = commandName;
-        this.aliases = aliases;
-        this.description = description;
-    }
-
-    private final String commandName;
-
-    private final String[] aliases;
-
-    private final String description;
-
-    @Override
-    public @NotNull
-    String getCommandName() {
-        return this.commandName;
-    }
-
-    @Override
-    public @NotNull
-    String[] getAliases() {
-        return this.aliases;
-    }
-
-    @Override
-    public @NotNull
-    String getDescription() {
-        return this.description;
+        super(commandName, aliases, description);
     }
 
     @Override

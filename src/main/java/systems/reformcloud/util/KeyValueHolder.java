@@ -29,7 +29,7 @@ import java.util.Map;
  * A basic implementation of a map entry
  *
  * @author Pasqual Koschmieder
- * @since 1.o
+ * @since 1.0
  */
 public final class KeyValueHolder<K, V> implements Map.Entry<K, V> {
 

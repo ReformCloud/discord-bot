@@ -103,6 +103,8 @@ public class GuildMessage implements DatabaseObject {
             stream.writeLong(this.creationTime);
             stream.writeUTF(this.message);
 
+            stream.writeObject(null);
+
             return byteArrayOutputStream.toByteArray();
         } catch (final IOException ex) {
             ex.printStackTrace();

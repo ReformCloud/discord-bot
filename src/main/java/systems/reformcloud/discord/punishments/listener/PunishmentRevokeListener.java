@@ -50,8 +50,7 @@ public final class PunishmentRevokeListener {
     @Subscribe
     public void handle(final PunishmentRevokeEvent event) {
         if (!event.getPunishment().getProvider().equals("discord")
-                || bot.getCurrentInstance().isEmpty()
-                || LoggerFeature.channel == null) {
+                || bot.getCurrentInstance().isEmpty()) {
             return;
         }
 
@@ -66,7 +65,6 @@ public final class PunishmentRevokeListener {
         }
 
         LoggerFeature.log(
-                LoggerFeature.channel,
                 "Revoked punishment #" + event.getPunishment().getUniqueID() + " from user " + discordMember.getUser().getName(),
                 new KeyValueHolder<>("punish time", Constants.DATE_FORMAT.format(event.getPunishment().getMilliTime())),
                 new KeyValueHolder<>("punish type", event.getPunishment().getPunishmentType()),

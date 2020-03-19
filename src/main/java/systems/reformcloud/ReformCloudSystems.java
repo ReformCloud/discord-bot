@@ -39,6 +39,8 @@ import java.io.IOException;
 public final class ReformCloudSystems {
 
     public static synchronized void main(String[] args) throws IOException {
+        Thread.currentThread().setUncaughtExceptionHandler((t, ex) -> ex.printStackTrace());
+
         var console = new BasicTerminalConsole();
         var handler = new ReformCloudSystemsBotHandler();
 
@@ -51,7 +53,6 @@ public final class ReformCloudSystems {
             }
         }));
 
-        Thread.currentThread().setUncaughtExceptionHandler((t, ex) -> ex.printStackTrace());
         TerminalReader.start(console);
     }
 }

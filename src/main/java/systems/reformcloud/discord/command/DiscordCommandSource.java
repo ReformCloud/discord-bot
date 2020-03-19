@@ -33,7 +33,7 @@ import systems.reformcloud.commands.source.CommandSource;
  * @author Pasqual Koschmieder
  * @since 1.0
  */
-public class DiscordCommandSource implements CommandSource {
+public final class DiscordCommandSource implements CommandSource {
 
     public DiscordCommandSource(TextChannel textChannel) {
         this.textChannel = textChannel;
