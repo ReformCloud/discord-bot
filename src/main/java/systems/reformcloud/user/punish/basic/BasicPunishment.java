@@ -26,6 +26,7 @@ package systems.reformcloud.user.punish.basic;
 import org.jetbrains.annotations.NotNull;
 import systems.reformcloud.api.GlobalAPI;
 import systems.reformcloud.user.punish.Punishment;
+import systems.reformcloud.user.punish.event.PunishmentCreateEvent;
 import systems.reformcloud.user.punish.event.PunishmentRevokeEvent;
 
 import java.io.ByteArrayOutputStream;
@@ -59,6 +60,8 @@ public class BasicPunishment implements Punishment {
 
         GlobalAPI.getDatabaseDriver().createTable("punishments_" + type);
         GlobalAPI.getDatabaseDriver().insert(this);
+
+        GlobalAPI.getEventManager().callEvent(new PunishmentCreateEvent(this));
     }
 
     private final UUID uniqueID;
