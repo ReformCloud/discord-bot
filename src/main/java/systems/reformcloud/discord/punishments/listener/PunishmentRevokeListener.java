@@ -64,6 +64,9 @@ public final class PunishmentRevokeListener {
             return;
         }
 
+        user.removePunishmentByUniqueId(event.getPunishment().getUniqueID());
+        this.bot.getAssociatedUserManagement().updateUser(user);
+
         var discordMember = DiscordUtil.getGuild().retrieveMemberById(user.getId()).submit().join();
         if (discordMember == null) {
             return;

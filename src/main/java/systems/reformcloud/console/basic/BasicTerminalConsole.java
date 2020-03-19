@@ -97,6 +97,7 @@ public class BasicTerminalConsole extends TerminalConsole {
         message = event.getLogMessage();
 
         this.lineReader.getTerminal().puts(InfoCmp.Capability.carriage_return);
+        this.lineReader.getTerminal().puts(InfoCmp.Capability.clr_eol);
         this.lineReader.getTerminal().writer().print(message);
         this.lineReader.getTerminal().flush();
 

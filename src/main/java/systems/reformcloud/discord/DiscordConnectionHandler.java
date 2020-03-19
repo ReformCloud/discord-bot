@@ -27,11 +27,14 @@ import com.google.common.base.Preconditions;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
+import net.dv8tion.jda.api.requests.GatewayIntent;
 import org.jetbrains.annotations.Nullable;
 import systems.reformcloud.bot.BotConnectionHandler;
 import systems.reformcloud.discord.config.DiscordConfigUtil;
 
 import javax.security.auth.login.LoginException;
+
+import static net.dv8tion.jda.api.requests.GatewayIntent.*;
 
 /**
  * Represents a default implementation of the {@link BotConnectionHandler} for the discord env.
@@ -49,7 +52,7 @@ public class DiscordConnectionHandler implements BotConnectionHandler<JDA> {
                     .createDefault(Preconditions.checkNotNull(
                             DiscordConfigUtil.parseProperties().getProperty("discord-token"),
                             "Unable to read discord token"
-                    ))
+                    ), GatewayIntent.getIntents(ALL_INTENTS & ~getRaw(GUILD_PRESENCES, GUILD_MESSAGE_TYPING, DIRECT_MESSAGE_TYPING)))
                     .setAutoReconnect(true)
                     .setEnableShutdownHook(true)
                     .setStatus(OnlineStatus.ONLINE)

@@ -48,6 +48,10 @@ public final class DiscordUtil {
 
     private static TextChannel loggingChannel;
 
+    private static TextChannel terminalChannel;
+
+    private static TextChannel informationChannel;
+
     private static Guild guild;
 
     private static int firstAutoMuteWarnCount;
@@ -65,6 +69,12 @@ public final class DiscordUtil {
         loggingChannel = checkNotNull(guild.getTextChannelById(getNonNull("discord-log-channel")),
                 "Unable to find logging text channel");
 
+        terminalChannel = checkNotNull(guild.getTextChannelById(getNonNull("discord-terminal-channel")),
+                "Unable to find terminal text channel");
+
+        informationChannel = checkNotNull(guild.getTextChannelById(getNonNull("discord-info-channel")),
+                "Unable to find information text channel");
+
         firstAutoMuteWarnCount = getInteger("discord-auto-mute-first");
         secondAutoMuteWarnCount = getInteger("discord-auto-mute-second");
         autoBanWarnCount = getInteger("discord-auto-ban");
@@ -78,6 +88,16 @@ public final class DiscordUtil {
     @NotNull
     public static TextChannel getLoggingChannel() {
         return loggingChannel;
+    }
+
+    @NotNull
+    public static TextChannel getTerminalChannel() {
+        return terminalChannel;
+    }
+
+    @NotNull
+    public static TextChannel getInformationChannel() {
+        return informationChannel;
     }
 
     @NotNull

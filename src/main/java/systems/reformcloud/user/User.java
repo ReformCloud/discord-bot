@@ -30,6 +30,7 @@ import systems.reformcloud.user.punish.Punishment;
 import systems.reformcloud.user.warn.Warn;
 
 import java.util.Collection;
+import java.util.UUID;
 
 /**
  * Represents an user of the system (for example a discord user)
@@ -51,10 +52,24 @@ public interface User extends DatabaseObject {
     UserInformation getInformation();
 
     /**
+     * Removes a specific warn by the unique id of it
+     *
+     * @param uniqueID The unique id of the warn which should get removed
+     */
+    void removeWarnByUniqueId(@NotNull UUID uniqueID);
+
+    /**
      * @return The warns which the user got
      */
     @NotNull
     Collection<Warn> getWarns();
+
+    /**
+     * Removes a specific punishment by the unique id of it
+     *
+     * @param uniqueID The unique id of the punishment which should get removed
+     */
+    void removePunishmentByUniqueId(@NotNull UUID uniqueID);
 
     /**
      * @return All punishments the user got

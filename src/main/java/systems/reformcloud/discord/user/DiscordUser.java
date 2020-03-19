@@ -33,8 +33,9 @@ import systems.reformcloud.user.warn.Warn;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Represents an implantation of an {@link User} for the discord env
@@ -47,15 +48,15 @@ public class DiscordUser implements User {
     public DiscordUser(long id) {
         this.id = id;
         this.userInformation = new BasicUserInformation();
-        this.warns = new ArrayList<>();
-        this.punishments = new ArrayList<>();
+        this.warns = new CopyOnWriteArrayList<>();
+        this.punishments = new CopyOnWriteArrayList<>();
     }
 
     DiscordUser(long id, UserInformation userInformation, Collection<Warn> warns, Collection<Punishment> punishments) {
         this.id = id;
         this.userInformation = userInformation;
-        this.warns = warns;
-        this.punishments = punishments;
+        this.warns = new CopyOnWriteArrayList<>(warns);
+        this.punishments = new CopyOnWriteArrayList<>(punishments);
     }
 
     private final long id;
@@ -78,9 +79,25 @@ public class DiscordUser implements User {
     }
 
     @Override
+    public void removeWarnByUniqueId(@NotNull UUID uniqueID) {
+        this.warns
+                .stream()
+                .filter(e -> e.getUniqueID().equals(uniqueID))
+                .forEach(warns::remove);
+    }
+
+    @Override
     public @NotNull
     Collection<Warn> getWarns() {
         return this.warns;
+    }
+
+    @Override
+    public void removePunishmentByUniqueId(@NotNull UUID uniqueID) {
+        this.punishments
+                .stream()
+                .filter(e -> e.getUniqueID().equals(uniqueID))
+                .forEach(punishments::remove);
     }
 
     @Override

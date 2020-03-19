@@ -41,6 +41,7 @@ import org.jetbrains.annotations.Nullable;
 import systems.reformcloud.api.GlobalAPI;
 import systems.reformcloud.bot.Bot;
 import systems.reformcloud.discord.DiscordUtil;
+import systems.reformcloud.discord.event.DiscordUserJoinEvent;
 import systems.reformcloud.discord.features.DiscordFeature;
 import systems.reformcloud.util.Constants;
 import systems.reformcloud.util.KeyValueHolder;
@@ -176,12 +177,14 @@ public class LoggerFeature extends DiscordFeature {
 
                 systemUser.getInformation().addJoin();
                 systemUser.getInformation().setJoinTime();
-
                 this.getApi().getAssociatedUserManagement().updateUser(systemUser);
+
                 log(
                         "A new user joined the discord server (" + event.getMember().getUser().getName() + ")",
                         new KeyValueHolder<>("id", Long.toString(systemUser.getId()))
                 );
+
+                GlobalAPI.getEventManager().callEvent(new DiscordUserJoinEvent(event, systemUser));
                 return;
             }
 
@@ -197,6 +200,8 @@ public class LoggerFeature extends DiscordFeature {
                     new KeyValueHolder<>("warns", Integer.toString(systemUser.getWarns().size())),
                     new KeyValueHolder<>("punishments", Integer.toString(systemUser.getPunishments().size()))
             );
+
+            GlobalAPI.getEventManager().callEvent(new DiscordUserJoinEvent(event, systemUser));
         });
     }
 
