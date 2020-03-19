@@ -48,6 +48,8 @@ public class DiscordUserJoinListener {
             DiscordUtil.getGuild().addRoleToMember(event.getEvent().getMember(), DiscordUtil.getPunishedRole()).queue();
         }
 
+        DiscordUtil.getGuild().addRoleToMember(event.getEvent().getMember(), DiscordUtil.getMemberRole()).queue();
+
         DiscordUtil.getLoggingChannel().sendMessage(new EmbedBuilder() // TODO: use terminal channel
                 .setColor(Color.BLUE)
                 .setAuthor("ReformCloudSystems", "https://reformcloud.systems",

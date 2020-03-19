@@ -46,6 +46,8 @@ public final class DiscordUtil {
 
     private static Role punishedRole;
 
+    private static Role memberRole;
+
     private static TextChannel loggingChannel;
 
     private static TextChannel terminalChannel;
@@ -66,6 +68,9 @@ public final class DiscordUtil {
         punishedRole = checkNotNull(guild.getRoleById(getNonNull("discord-punish-role")),
                 "Unable to find punished role");
 
+        memberRole = checkNotNull(guild.getRoleById(getNonNull("discord-member-role")),
+                "Unable to find member role");
+
         loggingChannel = checkNotNull(guild.getTextChannelById(getNonNull("discord-log-channel")),
                 "Unable to find logging text channel");
 
@@ -83,6 +88,11 @@ public final class DiscordUtil {
     @NotNull
     public static Role getPunishedRole() {
         return punishedRole;
+    }
+
+    @NotNull
+    public static Role getMemberRole() {
+        return memberRole;
     }
 
     @NotNull

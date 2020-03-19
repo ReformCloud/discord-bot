@@ -67,6 +67,7 @@ public final class DiscordConfigUtil {
             properties.setProperty("discord-log-channel", "null");
             properties.setProperty("discord-terminal-channel", "null");
             properties.setProperty("discord-info-channel", "null");
+            properties.setProperty("discord-member-role", "null");
 
             properties.setProperty("discord-auto-mute-first", "5");
             properties.setProperty("discord-auto-mute-second", "10");
