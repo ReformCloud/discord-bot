@@ -50,8 +50,6 @@ public final class PunishmentRevokeListener {
 
     @Subscribe
     public void handle(final PunishmentRevokeEvent event) {
-        System.out.println("Called punish revoke");
-
         if (!event.getPunishment().getProvider().equals("discord")
                 || bot.getCurrentInstance().isEmpty()) {
             return;
