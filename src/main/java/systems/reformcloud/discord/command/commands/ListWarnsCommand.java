@@ -45,11 +45,8 @@ import java.awt.*;
 public final class ListWarnsCommand extends BasicDiscordCommand {
 
     public ListWarnsCommand(@NotNull Bot<JDA> parent) {
-        super("listwarns", new String[]{"lw"}, "Lists the warns of an user");
-        this.parent = parent;
+        super(parent, "listwarns", new String[]{"lw"}, "Lists the warns of an user");
     }
-
-    private final Bot<JDA> parent;
 
     @NotNull
     @Override

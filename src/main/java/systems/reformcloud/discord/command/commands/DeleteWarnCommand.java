@@ -26,33 +26,27 @@ package systems.reformcloud.discord.command.commands;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Permission;
 import org.jetbrains.annotations.NotNull;
-import systems.reformcloud.api.GlobalAPI;
 import systems.reformcloud.bot.Bot;
 import systems.reformcloud.commands.source.CommandSource;
-import systems.reformcloud.discord.DiscordUtil;
 import systems.reformcloud.discord.command.BasicDiscordCommand;
 import systems.reformcloud.discord.command.util.CommandArgumentParser;
-import systems.reformcloud.discord.event.DiscordUserWarnEvent;
-import systems.reformcloud.user.warn.basic.BasicWarn;
-
-import java.util.Arrays;
 
 /**
- * A discord command for the warns
+ * A command to remove a warn from an user
  *
  * @author Pasqual Koschmieder
  * @since 1.0
  */
-public final class WarnCommand extends BasicDiscordCommand {
+public final class DeleteWarnCommand extends BasicDiscordCommand {
 
-    public WarnCommand(@NotNull Bot<JDA> parent) {
-        super(parent, "warn", new String[0], "Warns an user");
+    public DeleteWarnCommand(@NotNull Bot<JDA> parent) {
+        super(parent, "deletewarn", new String[]{"dw"}, "Deletes a warn from an user");
     }
 
     @NotNull
     @Override
     public Permission getPermission() {
-        return Permission.MESSAGE_MANAGE;
+        return Permission.ADMINISTRATOR;
     }
 
     @Override
@@ -61,40 +55,31 @@ public final class WarnCommand extends BasicDiscordCommand {
             return;
         }
 
-        if (strings.length < 2) {
-            source.sendMessage("Invalid command syntax! Use: `warn <user id | @mention> <reason>`");
+        if (strings.length != 2) {
+            source.sendMessage("Invalid command syntax! Use: `dw <user id | @mention> <warn unique id>`");
             return;
         }
 
-        var user = CommandArgumentParser.getUserOrCreate(strings[0], source, this.parent);
+        var user = CommandArgumentParser.getExistingUser(strings[0], source, this.parent);
         if (user == null) {
+            source.sendMessage("Unable to find user " + strings[0] + " in the database");
             return;
         }
 
-        var member = DiscordUtil.getGuild().retrieveMemberById(user.getId(), true).submit().join();
-        if (member == null && !source.hasPermission(Permission.ADMINISTRATOR)) {
-            source.sendMessage("You can only warn a member which is on the discord");
+        var warnUniqueID = CommandArgumentParser.parseUniqueId(strings[1]);
+        if (warnUniqueID == null) {
+            source.sendMessage("Please provide an unique id as second parameter");
             return;
         }
 
-        if (member != null && (member.hasPermission(Permission.MANAGE_CHANNEL)
-                || member.hasPermission(Permission.ADMINISTRATOR)
-                && !source.hasPermission(Permission.ADMINISTRATOR))) {
-            source.sendMessage("Unable to warn user " + user.getId());
+        if (user.getWarnByUniqueID(warnUniqueID) == null) {
+            source.sendMessage("The provided warn does not exists");
             return;
         }
 
-        var warn = new BasicWarn(
-                System.currentTimeMillis(),
-                source.getId(),
-                source.getName(),
-                String.join(" ", Arrays.copyOfRange(strings, 1, strings.length))
-        );
-
-        user.getWarns().add(warn);
+        user.removeWarnByUniqueId(warnUniqueID);
         this.parent.getAssociatedUserManagement().updateUser(user);
 
-        GlobalAPI.getEventManager().callEvent(new DiscordUserWarnEvent(warn, parent, source, user));
-        source.sendMessage("Warned user " + strings[0] + "! Reason: " + String.join(" ", Arrays.copyOfRange(strings, 1, strings.length)));
+        source.sendMessage(String.format("Successfully removed warn %s", warnUniqueID.toString()));
     }
 }

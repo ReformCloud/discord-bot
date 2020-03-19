@@ -24,6 +24,7 @@
 package systems.reformcloud.user;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import systems.reformcloud.database.object.DatabaseObject;
 import systems.reformcloud.user.information.UserInformation;
 import systems.reformcloud.user.punish.Punishment;
@@ -59,6 +60,21 @@ public interface User extends DatabaseObject {
     void removeWarnByUniqueId(@NotNull UUID uniqueID);
 
     /**
+     * Gets a specific warn by its unique id
+     *
+     * @param uniqueID The unique id of the warn
+     * @return The warn which has the provided unique id or {@code null}
+     */
+    @Nullable
+    default Warn getWarnByUniqueID(@NotNull UUID uniqueID) {
+        return this.getWarns()
+                .stream()
+                .filter(e -> e.getUniqueID().equals(uniqueID))
+                .findFirst()
+                .orElse(null);
+    }
+
+    /**
      * @return The warns which the user got
      */
     @NotNull
@@ -70,6 +86,21 @@ public interface User extends DatabaseObject {
      * @param uniqueID The unique id of the punishment which should get removed
      */
     void removePunishmentByUniqueId(@NotNull UUID uniqueID);
+
+    /**
+     * Gets a specific punishment by its unique id
+     *
+     * @param uniqueID The unique id of the punishment
+     * @return The punishment which has the provided unique id or {@code null}
+     */
+    @Nullable
+    default Punishment getPunishmentByUniqueID(@NotNull UUID uniqueID) {
+        return this.getPunishments()
+                .stream()
+                .filter(e -> e.getUniqueID().equals(uniqueID))
+                .findFirst()
+                .orElse(null);
+    }
 
     /**
      * @return All punishments the user got

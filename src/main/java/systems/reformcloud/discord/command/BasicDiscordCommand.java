@@ -23,9 +23,11 @@
  */
 package systems.reformcloud.discord.command;
 
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Permission;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import systems.reformcloud.bot.Bot;
 import systems.reformcloud.commands.basic.shared.SharedCommand;
 import systems.reformcloud.commands.source.CommandSource;
 import systems.reformcloud.discord.command.source.DiscordCommandSource;
@@ -38,9 +40,12 @@ import systems.reformcloud.discord.command.source.DiscordCommandSource;
  */
 public abstract class BasicDiscordCommand extends SharedCommand<Object> {
 
-    public BasicDiscordCommand(String commandName, String[] aliases, String description) {
+    public BasicDiscordCommand(@NotNull Bot<JDA> parent, String commandName, String[] aliases, String description) {
         super(commandName, aliases, description);
+        this.parent = parent;
     }
+
+    protected final Bot<JDA> parent;
 
     @Nullable
     @Override

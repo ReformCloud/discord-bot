@@ -30,6 +30,8 @@ import systems.reformcloud.bot.Bot;
 import systems.reformcloud.commands.source.CommandSource;
 import systems.reformcloud.user.User;
 
+import java.util.UUID;
+
 /**
  * A small util to parse some command arguments
  *
@@ -52,6 +54,7 @@ public final class CommandArgumentParser {
         return parent.getAssociatedUserManagement().getUserOrCreate(id);
     }
 
+    @Nullable
     public static User getExistingUser(@NotNull String argument, @NotNull CommandSource source, @NotNull Bot<JDA> parent) {
         var id = parseId(source, argument);
         if (id == null) {
@@ -59,6 +62,15 @@ public final class CommandArgumentParser {
         }
 
         return parent.getAssociatedUserManagement().getExistingUserById(id);
+    }
+
+    @Nullable
+    public static UUID parseUniqueId(@NotNull String argument) {
+        try {
+            return UUID.fromString(argument);
+        } catch (final IllegalArgumentException ex) {
+            return null;
+        }
     }
 
     private static Long parseId(@NotNull CommandSource source, @NotNull String argument) {
