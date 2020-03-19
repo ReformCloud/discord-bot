@@ -28,6 +28,8 @@ import systems.reformcloud.console.reader.TerminalReader;
 import systems.reformcloud.handler.ReformCloudSystemsBotHandler;
 
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * The main class which creates the instance of the console and bot handler and adds closes the things on
@@ -40,6 +42,7 @@ public final class ReformCloudSystems {
 
     public static synchronized void main(String[] args) throws IOException {
         Thread.currentThread().setUncaughtExceptionHandler((t, ex) -> ex.printStackTrace());
+        Logger.getLogger("").setLevel(Level.OFF);
 
         var console = new BasicTerminalConsole();
         var handler = new ReformCloudSystemsBotHandler();
