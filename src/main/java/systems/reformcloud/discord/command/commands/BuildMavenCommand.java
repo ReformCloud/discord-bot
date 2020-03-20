@@ -23,50 +23,27 @@
  */
 package systems.reformcloud.discord.command.commands;
 
-import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import org.jetbrains.annotations.NotNull;
 import systems.reformcloud.bot.Bot;
 import systems.reformcloud.commands.source.CommandSource;
 import systems.reformcloud.discord.command.BasicDiscordCommand;
-import systems.reformcloud.util.build.GradleUtil;
-
-import java.awt.*;
+import systems.reformcloud.util.build.MavenUtil;
 
 /**
- * Sends the gradle dependencies for more or exact one dependency
+ * Sends a simple maven pom.xml configuration file
  *
  * @author Pasqual Koschmieder
  * @since 1.0
  */
-public final class GradleCommand extends BasicDiscordCommand {
+public final class BuildMavenCommand extends BasicDiscordCommand {
 
-    public GradleCommand(@NotNull Bot<JDA> parent) {
-        super(parent, "!gradle", new String[0], "Shows a gradle configuration");
+    public BuildMavenCommand(@NotNull Bot<JDA> parent) {
+        super(parent, "!mbuild", new String[0], "Shows an example maven build script");
     }
 
     @Override
     public void execute(@NotNull CommandSource source, @NotNull String commandLine, @NotNull String[] strings) {
-        this.parent.getCurrentInstance().ifPresent(e -> {
-            var channel = e.getTextChannelById(source.getSourceChannel());
-            if (channel == null) {
-                return;
-            }
-
-            var description = "If you don't know how to configure your build.gradle use !gbuild\n"
-                    + GradleUtil.formatItem(strings.length == 0 ? null : strings);
-
-            var embed = new EmbedBuilder()
-                    .setColor(Color.BLUE)
-                    .setAuthor("Gradle dependenc" + (strings.length == 0 ? "y" : "ies"))
-                    .setDescription(description)
-                    .build();
-            if (!embed.isSendable()) {
-                source.sendMessage("The embed is too big to send! Please short your dependency search");
-                return;
-            }
-
-            channel.sendMessage(embed).queue();
-        });
+        source.sendMessage(MavenUtil.getFullMavenBuildConfig(strings.length == 0 ? null : strings));
     }
 }

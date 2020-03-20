@@ -48,6 +48,11 @@ public final class DiscordCommandSource implements CommandSource {
 
     @Override
     public void sendMessage(@NotNull String message) {
+        if (message.length() > 2000) {
+            this.sendMessage("Unable to send message! It's too large");
+            return;
+        }
+
         this.textChannel.sendMessage(message).queue();
     }
 

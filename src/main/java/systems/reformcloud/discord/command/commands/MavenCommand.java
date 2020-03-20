@@ -29,20 +29,20 @@ import org.jetbrains.annotations.NotNull;
 import systems.reformcloud.bot.Bot;
 import systems.reformcloud.commands.source.CommandSource;
 import systems.reformcloud.discord.command.BasicDiscordCommand;
-import systems.reformcloud.util.build.GradleUtil;
+import systems.reformcloud.util.build.MavenUtil;
 
 import java.awt.*;
 
 /**
- * Sends the gradle dependencies for more or exact one dependency
+ * Command to show a maven dependency list
  *
  * @author Pasqual Koschmieder
  * @since 1.0
  */
-public final class GradleCommand extends BasicDiscordCommand {
+public final class MavenCommand extends BasicDiscordCommand {
 
-    public GradleCommand(@NotNull Bot<JDA> parent) {
-        super(parent, "!gradle", new String[0], "Shows a gradle configuration");
+    public MavenCommand(@NotNull Bot<JDA> parent) {
+        super(parent, "!maven", new String[0], "Shows an example maven dependency configuration");
     }
 
     @Override
@@ -53,12 +53,12 @@ public final class GradleCommand extends BasicDiscordCommand {
                 return;
             }
 
-            var description = "If you don't know how to configure your build.gradle use !gbuild\n"
-                    + GradleUtil.formatItem(strings.length == 0 ? null : strings);
+            var description = "If you don't know how to configure your pom.xml use !mbuild\n"
+                    + MavenUtil.formatItem(strings.length == 0 ? null : strings);
 
             var embed = new EmbedBuilder()
                     .setColor(Color.BLUE)
-                    .setAuthor("Gradle dependenc" + (strings.length == 0 ? "y" : "ies"))
+                    .setAuthor("Mavens dependenc" + (strings.length == 0 ? "y" : "ies"))
                     .setDescription(description)
                     .build();
             if (!embed.isSendable()) {
