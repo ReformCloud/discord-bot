@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package systems.reformcloud.discord.config;
+package systems.reformcloud.config;
 
 import org.jetbrains.annotations.NotNull;
 import systems.reformcloud.util.FileUtils;
@@ -40,9 +40,9 @@ import java.util.Properties;
  * @author Pasqual Koschmieder
  * @since 1.0
  */
-public final class DiscordConfigUtil {
+public final class ConfigUtil {
 
-    private DiscordConfigUtil() {
+    private ConfigUtil() {
         throw new UnsupportedOperationException();
     }
 
@@ -72,6 +72,8 @@ public final class DiscordConfigUtil {
             properties.setProperty("discord-auto-mute-first", "5");
             properties.setProperty("discord-auto-mute-second", "10");
             properties.setProperty("discord-auto-ban", "15");
+
+            properties.setProperty("version-update-url", "https://internal.reformcloud.systems/version.properties");
 
             try (OutputStream stream = Files.newOutputStream(CONFIG)) {
                 properties.store(stream, "default configuration file");

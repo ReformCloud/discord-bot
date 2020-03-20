@@ -28,7 +28,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
 import org.jetbrains.annotations.NotNull;
-import systems.reformcloud.discord.config.DiscordConfigUtil;
+import systems.reformcloud.config.ConfigUtil;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -129,7 +129,7 @@ public final class DiscordUtil {
 
     @NotNull
     private static String getNonNull(String path) {
-        return checkNotNull(DiscordConfigUtil.parseProperties().getProperty(path));
+        return checkNotNull(ConfigUtil.parseProperties().getProperty(path));
     }
 
     private static int getInteger(String path) {

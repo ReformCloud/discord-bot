@@ -48,7 +48,7 @@ import java.util.concurrent.TimeUnit;
 public final class PunishCommand extends BasicDiscordCommand {
 
     public PunishCommand(@NotNull Bot<JDA> parent) {
-        super(parent, "punish", new String[0], "Punishes an user");
+        super(parent, "!punish", new String[0], "Punishes an user");
     }
 
     private final Cache<Long, Integer> coolDown = CacheBuilder

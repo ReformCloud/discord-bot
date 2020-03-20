@@ -39,6 +39,7 @@ import systems.reformcloud.discord.DiscordConnectionHandler;
 import systems.reformcloud.events.EventManager;
 import systems.reformcloud.events.basic.BasicEventManager;
 import systems.reformcloud.user.punish.util.PunishmentsDeleter;
+import systems.reformcloud.util.VersionChecker;
 
 /**
  * The main class handler for the reformcloud bot. Handles all database connections and console stuff.
@@ -58,6 +59,8 @@ public final class ReformCloudSystemsBotHandler {
 
     public ReformCloudSystemsBotHandler() {
         GlobalAPI.setParent(this);
+
+        VersionChecker.init();
 
         this.commandMap.registerCommand(new HelpCommand());
         this.commandMap.registerCommand(new StopCommand());

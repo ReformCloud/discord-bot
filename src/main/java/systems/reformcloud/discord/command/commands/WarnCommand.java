@@ -46,7 +46,7 @@ import java.util.Arrays;
 public final class WarnCommand extends BasicDiscordCommand {
 
     public WarnCommand(@NotNull Bot<JDA> parent) {
-        super(parent, "warn", new String[0], "Warns an user");
+        super(parent, "!warn", new String[0], "Warns an user");
     }
 
     @NotNull

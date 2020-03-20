@@ -44,7 +44,7 @@ import java.awt.*;
 public final class PingCommand extends BasicDiscordCommand {
 
     public PingCommand(@NotNull Bot<JDA> parent) {
-        super(parent, "ping", new String[0], "Shows the ping information of the bot");
+        super(parent, "!ping", new String[0], "Shows the ping information of the bot");
     }
 
     @Override

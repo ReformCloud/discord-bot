@@ -40,7 +40,7 @@ import systems.reformcloud.discord.command.util.CommandArgumentParser;
 public final class DeleteWarnCommand extends BasicDiscordCommand {
 
     public DeleteWarnCommand(@NotNull Bot<JDA> parent) {
-        super(parent, "deletewarn", new String[]{"dw"}, "Deletes a warn from an user");
+        super(parent, "!deletewarn", new String[]{"!dw"}, "Deletes a warn from an user");
     }
 
     @NotNull

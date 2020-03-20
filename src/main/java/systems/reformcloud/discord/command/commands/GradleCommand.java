@@ -25,71 +25,43 @@ package systems.reformcloud.discord.command.commands;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.Permission;
 import org.jetbrains.annotations.NotNull;
 import systems.reformcloud.bot.Bot;
 import systems.reformcloud.commands.source.CommandSource;
 import systems.reformcloud.discord.command.BasicDiscordCommand;
-import systems.reformcloud.discord.command.util.CommandArgumentParser;
-import systems.reformcloud.user.warn.Warn;
-import systems.reformcloud.util.Constants;
+import systems.reformcloud.util.build.GradleUtil;
 
 import java.awt.*;
 
 /**
- * A command to list all warns of a discord user
+ * Sends the gradle dependencies for more or exact one dependency
  *
  * @author Pasqual Koschmieder
  * @since 1.0
  */
-public final class ListWarnsCommand extends BasicDiscordCommand {
+public final class GradleCommand extends BasicDiscordCommand {
 
-    public ListWarnsCommand(@NotNull Bot<JDA> parent) {
-        super(parent, "!listwarns", new String[]{"!lw"}, "Lists the warns of an user");
-    }
-
-    @NotNull
-    @Override
-    public Permission getPermission() {
-        return Permission.MESSAGE_MANAGE;
+    public GradleCommand(@NotNull Bot<JDA> parent) {
+        super(parent, "!gradle", new String[0], "Shows a gradle configuration");
     }
 
     @Override
     public void execute(@NotNull CommandSource source, @NotNull String commandLine, @NotNull String[] strings) {
-        if (!source.hasPermission(getPermission())) {
-            return;
-        }
-
-        if (strings.length != 1) {
-            source.sendMessage("Invalid command syntax! Use: `lw <user id | @mention>`");
-            return;
-        }
-
-        var user = CommandArgumentParser.getExistingUser(strings[0], source, this.parent);
-        if (user == null) {
-            source.sendMessage("Unable to find user " + strings[0] + " in the database");
-            return;
-        }
-
-        EmbedBuilder builder = new EmbedBuilder()
-                .setColor(Color.YELLOW)
-                .setAuthor("ReformCloudSystems")
-                .setTitle("Warns of " + strings[0])
-                .setFooter(Constants.DATE_FORMAT.format(System.currentTimeMillis()))
-                .addField("total warns", Integer.toString(user.getWarns().size()), false);
-        for (Warn warn : user.getWarns()) {
-            builder.addField(
-                    Constants.DATE_FORMAT.format(warn.getMilliTime()) + " (" + warn.getUniqueID() + ")",
-                    String.format("Warned by: %s (%d); Reason: %s", warn.getWarnerName(), warn.getWarner(), warn.getReason()),
-                    false
-            );
-        }
-
         this.parent.getCurrentInstance().ifPresent(e -> {
             var channel = e.getTextChannelById(source.getSourceChannel());
-            if (channel != null) {
-                channel.sendMessage(builder.build()).queue();
+            if (channel == null) {
+                return;
             }
+
+            var description = "If you don't know how to configure your build.gradle use !gbuild\n"
+                    + GradleUtil.formatItem(strings.length == 0 ? null : strings);
+
+            channel.sendMessage(new EmbedBuilder()
+                    .setColor(Color.BLUE)
+                    .setAuthor("Gradle dependencie(s)")
+                    .setDescription(description)
+                    .build()
+            ).queue();
         });
     }
 }

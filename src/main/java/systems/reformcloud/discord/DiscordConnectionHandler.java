@@ -30,7 +30,7 @@ import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import org.jetbrains.annotations.Nullable;
 import systems.reformcloud.bot.BotConnectionHandler;
-import systems.reformcloud.discord.config.DiscordConfigUtil;
+import systems.reformcloud.config.ConfigUtil;
 
 import javax.security.auth.login.LoginException;
 
@@ -50,7 +50,7 @@ public class DiscordConnectionHandler implements BotConnectionHandler<JDA> {
         try {
             return JDABuilder
                     .createDefault(Preconditions.checkNotNull(
-                            DiscordConfigUtil.parseProperties().getProperty("discord-token"),
+                            ConfigUtil.parseProperties().getProperty("discord-token"),
                             "Unable to read discord token"
                     ), GatewayIntent.getIntents(ALL_INTENTS & ~getRaw(GUILD_PRESENCES, GUILD_MESSAGE_TYPING, DIRECT_MESSAGE_TYPING)))
                     .setAutoReconnect(true)

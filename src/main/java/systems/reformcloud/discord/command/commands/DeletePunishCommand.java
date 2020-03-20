@@ -40,7 +40,7 @@ import systems.reformcloud.discord.command.util.CommandArgumentParser;
 public final class DeletePunishCommand extends BasicDiscordCommand {
 
     public DeletePunishCommand(@NotNull Bot<JDA> parent) {
-        super(parent, "deletepunishment", new String[]{"dp"}, "Deletes a punishment from a user");
+        super(parent, "!deletepunishment", new String[]{"!dp"}, "Deletes a punishment from a user");
     }
 
     @NotNull
