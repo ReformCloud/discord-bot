@@ -27,6 +27,7 @@ import com.google.common.base.Preconditions;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
+import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import org.jetbrains.annotations.Nullable;
 import systems.reformcloud.bot.BotConnectionHandler;
@@ -56,6 +57,7 @@ public class DiscordConnectionHandler implements BotConnectionHandler<JDA> {
                     .setAutoReconnect(true)
                     .setEnableShutdownHook(true)
                     .setStatus(OnlineStatus.ONLINE)
+                    .setActivity(Activity.playing(ConfigUtil.parseProperties().getProperty("discord-activity", "nothing")))
                     .build()
                     .awaitReady();
         } catch (final LoginException | InterruptedException ex) {
