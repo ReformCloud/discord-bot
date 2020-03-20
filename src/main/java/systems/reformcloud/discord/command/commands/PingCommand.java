@@ -64,7 +64,7 @@ public final class PingCommand extends BasicDiscordCommand {
     private MessageEmbed buildEmbed(long gatewayPing, @Nullable Long restPing) {
         return new EmbedBuilder()
                 .setColor(Color.BLUE)
-                .setTitle("ReformCloudSystems", "https://reformcloud.systems")
+                .setAuthor("ReformCloudSystems", "https://reformcloud.systems")
                 .addField("Gateway ping", gatewayPing + "ms", false)
                 .addField("Rest ping", restPing == null ? "loading..." : restPing + "ms", false)
                 .setFooter(Constants.DATE_FORMAT.format(System.currentTimeMillis()))
