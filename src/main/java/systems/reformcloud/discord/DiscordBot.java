@@ -101,6 +101,7 @@ public class DiscordBot implements Bot<JDA> {
         GlobalAPI.getCommandMap().registerCommand(new ListPunishmentsCommand(this));
         GlobalAPI.getCommandMap().registerCommand(new DeletePunishCommand(this));
         GlobalAPI.getCommandMap().registerCommand(new PingCommand(this));
+        GlobalAPI.getCommandMap().registerCommand(new UptimeCommand(this));
     }
 
     @Override
