@@ -42,7 +42,7 @@ import java.awt.*;
  * @author Pasqual Koschmieder
  * @since 1.0
  */
-public class ListPunishmentsCommand extends BasicDiscordCommand {
+public final class ListPunishmentsCommand extends BasicDiscordCommand {
 
     public ListPunishmentsCommand(@NotNull Bot<JDA> parent) {
         super(parent, "listpunishments", new String[]{"lp"}, "List all punishments of a user");
