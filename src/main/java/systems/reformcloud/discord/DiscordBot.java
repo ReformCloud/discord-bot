@@ -64,25 +64,24 @@ public class DiscordBot implements Bot<JDA> {
 
         DiscordUtil.init(this.jda);
         DiscordUtil.getGuild().retrieveMembers().join();
-        DiscordUtil.getGuild().getMembers()
-                .stream()
-                .filter(e -> e.getRoles().size() == 0)
-                .forEach(e -> {
-                    var user = this.userManagement.getUserOrCreate(e.getIdLong());
-                    user.getPunishments()
-                            .stream()
-                            .filter(p -> p.getPunishmentType().equals(DefaultPunishmentTypes.BAN.name()))
-                            .findAny()
-                            .ifPresentOrElse(p -> DiscordUtil.getGuild().ban(e, 0, p.getReason()).queue(), () -> {
-                                if (user.getPunishments().size() > 0 && user.getPunishments()
-                                        .stream()
-                                        .anyMatch(p -> p.getPunishmentType().equals(DefaultPunishmentTypes.MUTE.name()))) {
-                                    DiscordUtil.getGuild().addRoleToMember(e, DiscordUtil.getPunishedRole()).queue();
-                                }
+        DiscordUtil.getGuild().getMembers().forEach(e -> {
+            var user = this.userManagement.getUserOrCreate(e.getIdLong());
+            if (e.getRoles().size() == 0) {
+                user.getPunishments()
+                        .stream()
+                        .filter(p -> p.getPunishmentType().equals(DefaultPunishmentTypes.BAN.name()))
+                        .findAny()
+                        .ifPresentOrElse(p -> DiscordUtil.getGuild().ban(e, 0, p.getReason()).queue(), () -> {
+                            if (user.getPunishments().size() > 0 && user.getPunishments()
+                                    .stream()
+                                    .anyMatch(p -> p.getPunishmentType().equals(DefaultPunishmentTypes.MUTE.name()))) {
+                                DiscordUtil.getGuild().addRoleToMember(e, DiscordUtil.getPunishedRole()).queue();
+                            }
 
-                                DiscordUtil.getGuild().addRoleToMember(e, DiscordUtil.getMemberRole()).queue();
-                            });
-                });
+                            DiscordUtil.getGuild().addRoleToMember(e, DiscordUtil.getMemberRole()).queue();
+                        });
+            }
+        });
 
         this.init(Arrays.asList(
                 new CommandHandlerFeature(),
@@ -108,6 +107,7 @@ public class DiscordBot implements Bot<JDA> {
         GlobalAPI.getCommandMap().registerCommand(new BuildMavenCommand(this));
         GlobalAPI.getCommandMap().registerCommand(new DocsCommand(this));
         GlobalAPI.getCommandMap().registerCommand(new HelpCommand(this));
+        GlobalAPI.getCommandMap().registerCommand(new UserInfoCommand(this));
     }
 
     @Override
