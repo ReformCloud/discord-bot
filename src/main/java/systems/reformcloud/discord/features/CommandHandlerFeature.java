@@ -23,12 +23,17 @@
  */
 package systems.reformcloud.discord.features;
 
+import com.google.common.base.Ticker;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
 import systems.reformcloud.api.GlobalAPI;
 import systems.reformcloud.discord.command.source.DiscordCommandSource;
 
 import javax.annotation.Nonnull;
+import java.util.concurrent.TimeUnit;
 
 /**
  * The command handler for the discord env
@@ -44,11 +49,23 @@ public class CommandHandlerFeature extends DiscordFeature {
         return "CommandHandler";
     }
 
+    private static final Cache<Long, Long> CACHE = CacheBuilder
+            .newBuilder()
+            .expireAfterWrite(10, TimeUnit.SECONDS)
+            .ticker(Ticker.systemTicker())
+            .build();
+
     @Override
     public void onGuildMessageReceived(@Nonnull GuildMessageReceivedEvent event) {
-        GlobalAPI.getCommandMap().dispatchCommand(new DiscordCommandSource(
+        if (CACHE.asMap().containsKey(event.getAuthor().getIdLong())) {
+            return;
+        }
+
+        if (GlobalAPI.getCommandMap().dispatchCommand(new DiscordCommandSource(
                 event.getChannel(),
                 event.getMember()
-        ), event.getMessage().getContentRaw());
+        ), event.getMessage().getContentRaw()) && event.getMember() != null && !event.getMember().hasPermission(Permission.MESSAGE_MANAGE)) {
+            CACHE.put(event.getAuthor().getIdLong(), -1L);
+        }
     }
 }
