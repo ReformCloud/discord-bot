@@ -44,6 +44,7 @@ public class HelpCommand extends BasicConsoleCommand {
     public void execute(@NotNull CommandSource source, @NotNull String commandLine, @NotNull String[] strings) {
         source.sendMessage("\n" + GlobalAPI.getCommandMap().getRegisteredCommands()
                 .stream()
+                .filter(e -> e.isAccessibleFrom(source))
                 .map(command -> String.format(" => %s: %s", command.getCommandName(), command.getDescription()))
                 .collect(Collectors.joining("\n")));
     }
