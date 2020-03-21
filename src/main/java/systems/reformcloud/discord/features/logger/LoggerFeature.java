@@ -99,6 +99,7 @@ public class LoggerFeature extends DiscordFeature {
     @Override
     public void onGuildMessageReceived(@Nonnull GuildMessageReceivedEvent event) {
         if (event.getAuthor().isBot()) {
+            event.getMessage().delete().queueAfter(30, TimeUnit.SECONDS);
             return;
         }
 

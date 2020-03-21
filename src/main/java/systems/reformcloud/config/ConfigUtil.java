@@ -74,6 +74,7 @@ public final class ConfigUtil {
             properties.setProperty("discord-auto-mute-second", "10");
             properties.setProperty("discord-auto-ban", "15");
 
+            properties.setProperty("docs-base-url", "https://docs.reformcloud.systems/");
             properties.setProperty("version-update-url", "https://internal.reformcloud.systems/version.properties");
 
             try (OutputStream stream = Files.newOutputStream(CONFIG)) {
