@@ -56,6 +56,17 @@ public final class DocsCommand extends BasicDiscordCommand {
 
     @Override
     public void execute(@NotNull CommandSource source, @NotNull String commandLine, @NotNull String[] strings) {
+        if (strings.length == 1 && strings[0].equalsIgnoreCase("help")) {
+            source.sendMessage(
+                    "`!docs` ....................................... Shows the online docs url\n" +
+                            "`!docs <class>` ..................... Shows the information about a specific class\n" +
+                            "`!docs <class>#<method>` . Shows information about a specific method in a class\n" +
+                            "`!docs <class>#<field>` ... Shows information about a specific field in a class"
+            );
+
+            return;
+        }
+
         this.parent.getCurrentInstance().ifPresent(e -> {
             var channel = e.getTextChannelById(source.getSourceChannel());
             if (channel == null) {
