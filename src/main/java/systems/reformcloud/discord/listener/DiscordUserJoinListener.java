@@ -55,7 +55,7 @@ public class DiscordUserJoinListener {
 
                     DiscordUtil.getGuild().addRoleToMember(event.getEvent().getMember(), DiscordUtil.getMemberRole()).queue();
 
-                    DiscordUtil.getLoggingChannel().sendMessage(new EmbedBuilder() // TODO: use terminal channel
+                    DiscordUtil.getTerminalChannel().sendMessage(new EmbedBuilder()
                             .setColor(Color.BLUE)
                             .setAuthor("ReformCloudSystems", "https://reformcloud.systems",
                                     "https://cdn.discordapp.com/emojis/557188390462947358.png")
