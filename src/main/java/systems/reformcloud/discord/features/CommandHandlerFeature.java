@@ -30,6 +30,7 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
 import systems.reformcloud.api.GlobalAPI;
+import systems.reformcloud.discord.DiscordUtil;
 import systems.reformcloud.discord.command.source.DiscordCommandSource;
 
 import javax.annotation.Nonnull;
@@ -57,6 +58,11 @@ public class CommandHandlerFeature extends DiscordFeature {
 
     @Override
     public void onGuildMessageReceived(@Nonnull GuildMessageReceivedEvent event) {
+        if (!event.getChannel().getId().equals(DiscordUtil.getBotCommandsChannel().getId())
+                && event.getMember() != null && !event.getMember().hasPermission(Permission.MESSAGE_MANAGE)) {
+            return;
+        }
+
         if (CACHE.asMap().containsKey(event.getAuthor().getIdLong())) {
             return;
         }

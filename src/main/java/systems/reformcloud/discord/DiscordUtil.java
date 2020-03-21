@@ -54,6 +54,8 @@ public final class DiscordUtil {
 
     private static TextChannel informationChannel;
 
+    private static TextChannel botCommandsChannel;
+
     private static Guild guild;
 
     private static int firstAutoMuteWarnCount;
@@ -76,6 +78,9 @@ public final class DiscordUtil {
 
         terminalChannel = checkNotNull(guild.getTextChannelById(getNonNull("discord-terminal-channel")),
                 "Unable to find terminal text channel");
+
+        botCommandsChannel = checkNotNull(guild.getTextChannelById(getNonNull("discord-bot-command-channel")),
+                "Unable to find bot commands text channel");
 
         informationChannel = checkNotNull(guild.getTextChannelById(getNonNull("discord-info-channel")),
                 "Unable to find information text channel");
@@ -103,6 +108,11 @@ public final class DiscordUtil {
     @NotNull
     public static TextChannel getTerminalChannel() {
         return terminalChannel;
+    }
+
+    @NotNull
+    public static TextChannel getBotCommandsChannel() {
+        return botCommandsChannel;
     }
 
     @NotNull
