@@ -99,6 +99,11 @@ public class LoggerFeature extends DiscordFeature {
     @Override
     public void onGuildMessageReceived(@Nonnull GuildMessageReceivedEvent event) {
         if (event.getAuthor().isBot()) {
+            if (event.getChannel().getId().equals(DiscordUtil.getLoggingChannel().getId())
+                    || event.getChannel().getId().equals(DiscordUtil.getTerminalChannel().getId())) {
+                return;
+            }
+
             event.getMessage().delete().queueAfter(30, TimeUnit.SECONDS);
             return;
         }
