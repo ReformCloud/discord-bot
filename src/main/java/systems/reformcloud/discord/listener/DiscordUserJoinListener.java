@@ -24,6 +24,8 @@
 package systems.reformcloud.discord.listener;
 
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Member;
+import org.jetbrains.annotations.NotNull;
 import systems.reformcloud.discord.DiscordUtil;
 import systems.reformcloud.discord.event.DiscordUserJoinEvent;
 import systems.reformcloud.events.annotations.Subscribe;
@@ -40,8 +42,10 @@ import java.awt.*;
  */
 public class DiscordUserJoinListener {
 
+    public static boolean giveMemberRole = true;
+
     @Subscribe
-    public void handle(final DiscordUserJoinEvent event) {
+    public void handle(@NotNull final DiscordUserJoinEvent event) {
         event.getUser().getPunishments()
                 .stream()
                 .filter(e -> e.getPunishmentType().equals(DefaultPunishmentTypes.BAN.name()))
@@ -53,17 +57,23 @@ public class DiscordUserJoinListener {
                         DiscordUtil.getGuild().addRoleToMember(event.getEvent().getMember(), DiscordUtil.getPunishedRole()).queue();
                     }
 
-                    DiscordUtil.getGuild().addRoleToMember(event.getEvent().getMember(), DiscordUtil.getMemberRole()).queue();
-
-                    DiscordUtil.getTerminalChannel().sendMessage(new EmbedBuilder()
-                            .setColor(Color.BLUE)
-                            .setAuthor("ReformCloudSystems", "https://reformcloud.systems",
-                                    "https://cdn.discordapp.com/emojis/557188390462947358.png")
-                            .setTitle(String.format("Welcome %s on the ReformCloud discord!", event.getEvent().getUser().getName()))
-                            .setThumbnail(event.getEvent().getUser().getAvatarUrl())
-                            .addField("", "Please read the information in " + DiscordUtil.getInformationChannel().getAsMention(), true)
-                            .build()
-                    ).queue();
+                    if (giveMemberRole) {
+                        addMemberRoleAndSendGreeting(event.getEvent().getMember());
+                    }
                 });
+    }
+
+    public static void addMemberRoleAndSendGreeting(@NotNull Member member) {
+        DiscordUtil.getGuild().addRoleToMember(member, DiscordUtil.getMemberRole()).queue();
+
+        DiscordUtil.getTerminalChannel().sendMessage(new EmbedBuilder()
+                .setColor(Color.BLUE)
+                .setAuthor("ReformCloudSystems", "https://reformcloud.systems",
+                        "https://cdn.discordapp.com/emojis/557188390462947358.png")
+                .setTitle(String.format("Welcome %s on the ReformCloud discord!", member.getUser().getName()))
+                .setThumbnail(member.getUser().getAvatarUrl())
+                .addField("", "Please read the information in " + DiscordUtil.getInformationChannel().getAsMention(), true)
+                .build()
+        ).queue();
     }
 }

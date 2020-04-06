@@ -60,7 +60,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class LoggerFeature extends DiscordFeature {
 
-    private final Cache<Long, GuildMessage> messageCache = CacheBuilder
+    public static final Cache<Long, GuildMessage> messageCache = CacheBuilder
             .newBuilder()
             .initialCapacity(10000)
             .maximumSize(10000)
@@ -111,7 +111,7 @@ public class LoggerFeature extends DiscordFeature {
         Constants.EXECUTOR_SERVICE.execute(() -> {
             var message = GuildMessage.fromMessage(event.getMessage());
 
-            this.messageCache.put(event.getMessageIdLong(), message);
+            messageCache.put(event.getMessageIdLong(), message);
             GlobalAPI.getDatabaseDriver().insert(message);
         });
     }
@@ -130,8 +130,8 @@ public class LoggerFeature extends DiscordFeature {
                 return;
             }
 
-            this.messageCache.invalidate(event.getMessageIdLong());
-            this.messageCache.put(event.getMessageIdLong(), message);
+            messageCache.invalidate(event.getMessageIdLong());
+            messageCache.put(event.getMessageIdLong(), message);
             GlobalAPI.getDatabaseDriver().update(message);
 
             log(
@@ -165,7 +165,7 @@ public class LoggerFeature extends DiscordFeature {
                 );
             });
 
-            this.messageCache.invalidate(message.getMessageId());
+            messageCache.invalidate(message.getMessageId());
             GlobalAPI.getDatabaseDriver().deleteFromTable(message);
         });
     }
@@ -264,7 +264,7 @@ public class LoggerFeature extends DiscordFeature {
 
     @Nullable
     private GuildMessage getMessageFromCacheOrDatabase(@NotNull GenericGuildMessageEvent event) {
-        var message = this.messageCache.getIfPresent(event.getMessageIdLong());
+        var message = messageCache.getIfPresent(event.getMessageIdLong());
         if (message == null) {
             message = GlobalAPI.getDatabaseDriver().getOrDefault(new GuildMessageDatabaseObjectToken(event.getMessageIdLong()), null);
         }

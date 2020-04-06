@@ -69,6 +69,7 @@ public final class ConfigUtil {
             properties.setProperty("discord-info-channel", "null");
             properties.setProperty("discord-member-role", "null");
             properties.setProperty("discord-bot-command-channel", "null");
+            properties.setProperty("discord-captcha-request-message", "null");
             properties.setProperty("discord-activity", "ReformCloud");
 
             properties.setProperty("discord-auto-mute-first", "5");

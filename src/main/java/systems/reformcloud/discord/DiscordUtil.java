@@ -58,6 +58,8 @@ public final class DiscordUtil {
 
     private static Guild guild;
 
+    private static String captchaRequestMessage;
+
     private static int firstAutoMuteWarnCount;
 
     private static int secondAutoMuteWarnCount;
@@ -85,6 +87,7 @@ public final class DiscordUtil {
         informationChannel = checkNotNull(guild.getTextChannelById(getNonNull("discord-info-channel")),
                 "Unable to find information text channel");
 
+        captchaRequestMessage = getNonNull("discord-captcha-request-message");
         firstAutoMuteWarnCount = getInteger("discord-auto-mute-first");
         secondAutoMuteWarnCount = getInteger("discord-auto-mute-second");
         autoBanWarnCount = getInteger("discord-auto-ban");
@@ -123,6 +126,11 @@ public final class DiscordUtil {
     @NotNull
     public static Guild getGuild() {
         return guild;
+    }
+
+    @NotNull
+    public static String getCaptchaRequestMessage() {
+        return captchaRequestMessage;
     }
 
     public static int getFirstAutoMuteWarnCount() {

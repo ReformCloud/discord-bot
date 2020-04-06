@@ -32,6 +32,7 @@ import systems.reformcloud.bot.BotConnectionHandler;
 import systems.reformcloud.bot.feature.BotFeature;
 import systems.reformcloud.discord.command.commands.*;
 import systems.reformcloud.discord.features.CommandHandlerFeature;
+import systems.reformcloud.discord.features.antibot.AntiSelfBotFeature;
 import systems.reformcloud.discord.features.logger.LoggerFeature;
 import systems.reformcloud.discord.listener.DiscordUserJoinListener;
 import systems.reformcloud.discord.listener.DiscordWarnCreateListener;
@@ -85,7 +86,8 @@ public class DiscordBot implements Bot<JDA> {
 
         this.init(Arrays.asList(
                 new CommandHandlerFeature(),
-                new LoggerFeature()
+                new LoggerFeature(),
+                new AntiSelfBotFeature()
         ));
 
         GlobalAPI.getEventManager().registerListener(new PunishmentRevokeListener(this));
