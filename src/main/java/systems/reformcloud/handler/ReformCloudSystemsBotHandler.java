@@ -51,7 +51,7 @@ public final class ReformCloudSystemsBotHandler {
 
     private final EventManager eventManager = new BasicEventManager();
     private final CommandMap commandMap = new BasicCommandMap();
-    private final PunishmentsDeleter punishmentsDeleter = new PunishmentsDeleter();
+    private final PunishmentsDeleter punishmentsDeleter;
     private final DatabaseDriver databaseDriver;
     private final Bot<JDA> discordBot;
 
@@ -69,6 +69,7 @@ public final class ReformCloudSystemsBotHandler {
         this.discordBot = new DiscordBot();
         this.discordBot.doConnect(new DiscordConnectionHandler());
 
+        this.punishmentsDeleter = new PunishmentsDeleter();
         this.punishmentsDeleter.setDaemon(true);
         this.punishmentsDeleter.start();
     }
