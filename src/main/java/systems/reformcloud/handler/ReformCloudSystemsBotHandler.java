@@ -50,12 +50,10 @@ import systems.reformcloud.util.VersionChecker;
 public final class ReformCloudSystemsBotHandler {
 
     private final EventManager eventManager = new BasicEventManager();
-
     private final CommandMap commandMap = new BasicCommandMap();
-
+    private final PunishmentsDeleter punishmentsDeleter = new PunishmentsDeleter();
     private final DatabaseDriver databaseDriver;
-
-    private Bot<JDA> discordBot;
+    private final Bot<JDA> discordBot;
 
     public ReformCloudSystemsBotHandler() {
         GlobalAPI.setParent(this);
@@ -71,8 +69,8 @@ public final class ReformCloudSystemsBotHandler {
         this.discordBot = new DiscordBot();
         this.discordBot.doConnect(new DiscordConnectionHandler());
 
-        PunishmentsDeleter.startReload();
-        PunishmentsDeleter.startExpiredHandler();
+        this.punishmentsDeleter.setDaemon(true);
+        this.punishmentsDeleter.start();
     }
 
     /**
@@ -108,6 +106,7 @@ public final class ReformCloudSystemsBotHandler {
         }
 
         this.eventManager.unregisterAll();
+        this.punishmentsDeleter.interrupt();
 
         if (this.databaseDriver != null) {
             this.databaseDriver.close();

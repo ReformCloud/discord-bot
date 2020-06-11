@@ -107,7 +107,6 @@ public class DiscordBot implements Bot<JDA> {
         GlobalAPI.getCommandMap().registerCommand(new BuildGradleCommand(this));
         GlobalAPI.getCommandMap().registerCommand(new MavenCommand(this));
         GlobalAPI.getCommandMap().registerCommand(new BuildMavenCommand(this));
-        GlobalAPI.getCommandMap().registerCommand(new DocsCommand(this));
         GlobalAPI.getCommandMap().registerCommand(new HelpCommand(this));
         GlobalAPI.getCommandMap().registerCommand(new UserInfoCommand(this));
     }

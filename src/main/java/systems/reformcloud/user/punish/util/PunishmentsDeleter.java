@@ -26,11 +26,9 @@ package systems.reformcloud.user.punish.util;
 import systems.reformcloud.api.GlobalAPI;
 import systems.reformcloud.user.punish.DefaultPunishmentTypes;
 import systems.reformcloud.user.punish.Punishment;
-import systems.reformcloud.util.Constants;
 
 import java.util.Collection;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.TimeUnit;
 
 /**
  * A runner which revokes every ten seconds all expired punishments and reloads every 10 minutes the
@@ -39,34 +37,34 @@ import java.util.concurrent.TimeUnit;
  * @author Pasqual Koschmieder
  * @since 1.0
  */
-public final class PunishmentsDeleter {
+public final class PunishmentsDeleter extends Thread {
 
-    private PunishmentsDeleter() {
-        throw new UnsupportedOperationException();
-    }
-
-    private static Collection<Punishment> expiringPunishments = new CopyOnWriteArrayList<>();
-
-    public static void startReload() {
+    public PunishmentsDeleter() {
         for (DefaultPunishmentTypes type : DefaultPunishmentTypes.values()) {
             GlobalAPI.getDatabaseDriver().createTable("punishments_" + type);
         }
-
-        Constants.SCHEDULED_EXECUTOR_SERVICE.scheduleAtFixedRate(() -> {
-            expiringPunishments.addAll(PunishmentsDatabaseReader.getExpiringPunishments(DefaultPunishmentTypes.MUTE.name()));
-            expiringPunishments.addAll(PunishmentsDatabaseReader.getExpiringPunishments(DefaultPunishmentTypes.BAN.name()));
-        }, 0, 1, TimeUnit.MINUTES);
     }
 
-    public static void startExpiredHandler() {
-        Constants.SCHEDULED_EXECUTOR_SERVICE.scheduleAtFixedRate(() -> {
-            expiringPunishments
+    private static final Collection<Punishment> EXPIRING_PUNISHMENTS = new CopyOnWriteArrayList<>();
+
+    @Override
+    public void run() {
+        while (!Thread.interrupted()) {
+            EXPIRING_PUNISHMENTS.addAll(PunishmentsDatabaseReader.getExpiringPunishments(DefaultPunishmentTypes.MUTE.name()));
+            EXPIRING_PUNISHMENTS.addAll(PunishmentsDatabaseReader.getExpiringPunishments(DefaultPunishmentTypes.BAN.name()));
+
+            EXPIRING_PUNISHMENTS
                     .stream()
                     .filter(e -> e.getTimeoutTime() <= System.currentTimeMillis())
                     .forEach(e -> {
                         e.revoke();
-                        expiringPunishments.remove(e);
+                        EXPIRING_PUNISHMENTS.remove(e);
                     });
-        }, 0, 1, TimeUnit.SECONDS);
+
+            try {
+                Thread.sleep(1000L);
+            } catch (InterruptedException ignored) {
+            }
+        }
     }
 }
