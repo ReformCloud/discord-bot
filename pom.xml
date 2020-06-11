@@ -25,7 +25,7 @@
         <dependency>
             <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
-            <version>4.1.1_130</version>
+            <version>4.1.1_145</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.jetbrains</groupId>
@@ -45,7 +45,7 @@
         <dependency>
             <groupId>org.jline</groupId>
             <artifactId>jline</artifactId>
-            <version>3.14.0</version>
+            <version>3.14.1</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.jetbrains/annotations-java5 -->
@@ -59,7 +59,7 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>28.2-jre</version>
+            <version>29.0-jre</version>
         </dependency>
 
         <dependency>
@@ -82,7 +82,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.2.2</version>
+                <version>3.2.3</version>
                 <executions>
                     <execution>
                         <!-- shade while package -->
