@@ -28,10 +28,11 @@ import systems.reformcloud.api.GlobalAPI;
 import systems.reformcloud.user.punish.Punishment;
 import systems.reformcloud.user.punish.basic.PunishmentDatabaseObjectToken;
 
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 /**
  * A simple database reader which
@@ -46,8 +47,9 @@ public final class PunishmentsDatabaseReader {
     }
 
     @NotNull
-    public static Collection<Punishment> getExpiringPunishments(@NotNull String type) {
-        return GlobalAPI.getDatabaseDriver().keys("punishments_" + type)
+    public static Map<UUID, Punishment> getExpiringPunishments(@NotNull String type) {
+        Map<UUID, Punishment> map = new HashMap<>();
+        GlobalAPI.getDatabaseDriver().keys("punishments_" + type)
                 .filter(Objects::nonNull)
                 .map(e -> {
                     try {
@@ -60,6 +62,7 @@ public final class PunishmentsDatabaseReader {
                 .filter(e -> (e + TimeUnit.MINUTES.toMillis(10) > System.currentTimeMillis()))
                 .map(e -> GlobalAPI.getDatabaseDriver().getOrDefault(new PunishmentDatabaseObjectToken(e, type), null))
                 .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+                .forEach(punishment -> map.putIfAbsent(punishment.getUniqueID(), punishment));
+        return map;
     }
 }

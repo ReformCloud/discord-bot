@@ -27,8 +27,10 @@ import systems.reformcloud.api.GlobalAPI;
 import systems.reformcloud.user.punish.DefaultPunishmentTypes;
 import systems.reformcloud.user.punish.Punishment;
 
-import java.util.Collection;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 /**
  * A runner which revokes every ten seconds all expired punishments and reloads every 10 minutes the
@@ -45,24 +47,25 @@ public final class PunishmentsDeleter extends Thread {
         }
     }
 
-    private static final Collection<Punishment> EXPIRING_PUNISHMENTS = new CopyOnWriteArrayList<>();
+    private static final Map<UUID, Punishment> EXPIRING_PUNISHMENTS = new ConcurrentHashMap<>();
 
     @Override
     public void run() {
         while (!Thread.interrupted()) {
-            EXPIRING_PUNISHMENTS.addAll(PunishmentsDatabaseReader.getExpiringPunishments(DefaultPunishmentTypes.MUTE.name()));
-            EXPIRING_PUNISHMENTS.addAll(PunishmentsDatabaseReader.getExpiringPunishments(DefaultPunishmentTypes.BAN.name()));
+            EXPIRING_PUNISHMENTS.putAll(PunishmentsDatabaseReader.getExpiringPunishments(DefaultPunishmentTypes.MUTE.name()));
+            EXPIRING_PUNISHMENTS.putAll(PunishmentsDatabaseReader.getExpiringPunishments(DefaultPunishmentTypes.BAN.name()));
 
             EXPIRING_PUNISHMENTS
+                    .values()
                     .stream()
                     .filter(e -> e.getTimeoutTime() <= System.currentTimeMillis())
                     .forEach(e -> {
                         e.revoke();
-                        EXPIRING_PUNISHMENTS.remove(e);
+                        EXPIRING_PUNISHMENTS.remove(e.getUniqueID());
                     });
 
             try {
-                Thread.sleep(1000L);
+                TimeUnit.SECONDS.sleep(10);
             } catch (InterruptedException ignored) {
             }
         }

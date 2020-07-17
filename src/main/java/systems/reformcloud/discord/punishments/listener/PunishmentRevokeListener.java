@@ -56,7 +56,7 @@ public final class PunishmentRevokeListener {
         }
 
         if (event.getPunishment().getPunishmentType().equals(DefaultPunishmentTypes.BAN.name())) {
-            DiscordUtil.getGuild().unban(Long.toUnsignedString(event.getPunishment().getUserID())).queue();
+            DiscordUtil.getGuild().unban(Long.toString(event.getPunishment().getUserID())).queue();
         }
 
         var user = bot.getAssociatedUserManagement().getExistingUserById(event.getPunishment().getUserID());

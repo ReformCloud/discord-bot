@@ -43,6 +43,8 @@ import java.util.UUID;
  */
 public class BasicPunishment implements Punishment {
 
+    private static final long serialVersionUID = 4112141658080448629L;
+
     BasicPunishment(UUID uniqueID, long userID, long time, long warner, long timeout, String provider, String warnerName, String type, String reason) {
         this.uniqueID = uniqueID;
         this.userID = userID;
@@ -148,6 +150,25 @@ public class BasicPunishment implements Punishment {
     @Override
     public String getTable() {
         return "punishments_" + type;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (!(o instanceof BasicPunishment)) {
+            return false;
+        }
+
+        var that = (BasicPunishment) o;
+        return that.getUniqueID().equals(this.getUniqueID());
+    }
+
+    @Override
+    public int hashCode() {
+        return this.uniqueID.hashCode();
     }
 
     @NotNull

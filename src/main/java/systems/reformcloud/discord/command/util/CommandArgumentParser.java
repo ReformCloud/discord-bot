@@ -87,10 +87,8 @@ public final class CommandArgumentParser {
         switch (argument.toLowerCase()) {
             case "d":
                 return TimeUnit.DAYS;
-
             case "h":
                 return TimeUnit.HOURS;
-
             default:
                 return null;
         }
