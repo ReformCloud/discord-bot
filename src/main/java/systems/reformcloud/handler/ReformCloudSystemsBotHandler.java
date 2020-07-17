@@ -108,9 +108,5 @@ public final class ReformCloudSystemsBotHandler {
 
         this.eventManager.unregisterAll();
         this.punishmentsDeleter.interrupt();
-
-        if (this.databaseDriver != null) {
-            this.databaseDriver.close();
-        }
     }
 }
