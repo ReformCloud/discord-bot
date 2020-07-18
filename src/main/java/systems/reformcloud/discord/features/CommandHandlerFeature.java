@@ -52,7 +52,7 @@ public class CommandHandlerFeature extends DiscordFeature {
 
     private static final Cache<Long, Long> CACHE = CacheBuilder
             .newBuilder()
-            .expireAfterWrite(10, TimeUnit.SECONDS)
+            .expireAfterWrite(5, TimeUnit.SECONDS)
             .ticker(Ticker.systemTicker())
             .build();
 
